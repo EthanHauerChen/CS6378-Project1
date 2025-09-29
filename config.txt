@@ -1,0 +1,2 @@
+# s i x g l o b a l p a r ame te r s ( s e e above )
+5 6 10 100 2000 15
