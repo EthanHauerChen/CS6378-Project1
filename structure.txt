@@ -1,0 +1,19 @@
+nodes:
+	connections to other nodes
+
+	initiateConnections
+	listenConnections
+	sendMessage
+	becomePassive/Active
+
+
+message:
+
+protocol:
+children are MAPProtocol and CLProtocol
+	active/passive
+	minPerActive
+	maxPerActive
+	minSendDelay
+
+	beginProtocol: should start the protocol, node should not start the protocol, only initiate (be first node to become active or however the protocol is initiated)
