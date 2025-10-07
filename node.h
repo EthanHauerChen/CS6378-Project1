@@ -1,28 +1,28 @@
 #ifndef NODE_H
 #define NODE_H
-#include <unordered_set>
+#include <unordered_map>
 #include <string>
 #include <sys/socket.h>
 #include <vector>
 
 class Node {
+    int node_number;
     std::string hostname;
     int port;
     bool isActive;
-
     struct Connection {
-        int fd;
-        struct sockaddr_in address;
-    }
-
-    std::unordered_set<Connection> connections;
+        int read_fd;
+        int write_fd;
+    };
+    std::unordered_map<int, Connection> connections;
 
 public:
-    Node(std::string hostname, int port);
-    int listen_for_connections();
-    int initiate_connections();
+    Node(std::string, int);
+    int listen_for_connections(int);
+    int initiate_connections(int[], std::string[], int[], int);
     void become_active();
     void become_passive();
+    void send_message(const std::string&);
 };
 
 #endif
