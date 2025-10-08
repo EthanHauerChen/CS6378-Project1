@@ -18,8 +18,11 @@ class Node {
 
 public:
     Node(std::string, int);
+    /** make private, called using setup() function */
     int listen_for_connections(int);
     int initiate_connections(int[], std::string[], int[], int);
+    /************************************************************ */
+    int setup(); //likely need to pass args needed for above 2 functions, maybe as a struct
     void become_active();
     void become_passive();
     void send_message(const std::string&);
