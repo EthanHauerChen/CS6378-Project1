@@ -4,6 +4,9 @@
 #include <unistd.h>
 #include <netdb.h>
 #include <cstring>
+#include <iostream>
+#include <thread>
+#include <chrono>
 
 Node::Node(std::string hostname, int port) {
     this->hostname = hostname;
@@ -44,6 +47,7 @@ int Node::listen_for_connections(int num_neighbors) {
         /* accept incoming connections */
         int connection_fd = accept(sockfd, NULL, NULL);
         if (connection_fd > 0) {
+            std::cout << "Connected to a client\n";
             num_connections++;
             /* determine which node has connected */
             int node;
@@ -84,10 +88,11 @@ int Node::initiate_connections(int* nodes, std::string* hostnames, int* ports, i
             return -2;
         }
         memcpy(&address.sin_addr, host->h_addr_list[0], host->h_length);
-        if (connect(sockfd, (struct sockaddr *)&address, sizeof(address))) {
+        while (connect(sockfd, (struct sockaddr *)&address, sizeof(address)) != 0) {
             fprintf(stderr, "error: cannot connect to host %s\n", hostnames[i].c_str());
-            return -3;
+            std::this_thread::sleep_for(std::chrono::seconds(1));
         }
+        std::cout << "Connected to server";
 
         /* place associated socket fd into connections hash table */
         if (connections.find(nodes[i]) == connections.end()) { //same as connections.contains(node), but contains only available for c++20 
