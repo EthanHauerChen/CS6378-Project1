@@ -1,5 +1,6 @@
 #include "node.h"
 #include <thread>
+#include <iostream>
 
 void list(Node a, int num_neighbors) { //wrapper around Node::listen_for_connections
     a.listen_for_connections(num_neighbors);
@@ -14,11 +15,16 @@ int main(int argc, char** argv) {
     int nodes[] = {1};
     std::string hostnames[] = {"localhost"};
     int ports[1];
-    if (argv[1] == "8000") {
+    if (std::stoi(argv[1]) == 8000) {
         ports[0] = 8001;
     }
-    else ports[0] = 8000;
+    else {
+        ports[0] = 8000;
+    }
+    std::cout << a;
 
+    std::cout << "argv[1]: " << argv[1] << "\n";
+    std::cout << "connect to: " << ports[0] << "\n";
     std::thread l(list, a,  1);
     std::thread c(con, a, nodes, hostnames, ports, 1);
 

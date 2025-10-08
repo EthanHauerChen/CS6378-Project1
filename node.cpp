@@ -16,7 +16,6 @@ Node::Node(std::string hostname, int port) {
 int Node::listen_for_connections(int num_neighbors) { 
     int sockfd = -1;
     struct sockaddr_in address;
-    int port;
 
     /* create socket */
     sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -39,7 +38,7 @@ int Node::listen_for_connections(int num_neighbors) {
         fprintf(stderr, "error: unable to listen on port\n");
         return -3;
     }
-    printf("ready and listening\n");
+    printf("ready and listening on %s:%d\n", hostname.c_str(), port);
     
     int num_connections = 0;
     while (num_connections < num_neighbors)
@@ -92,7 +91,7 @@ int Node::initiate_connections(int* nodes, std::string* hostnames, int* ports, i
             fprintf(stderr, "error: cannot connect to host %s\n", hostnames[i].c_str());
             std::this_thread::sleep_for(std::chrono::seconds(1));
         }
-        std::cout << "Connected to server";
+        std::cout << "Connected to server " << hostnames[i] << ":" << ports[i] << "\n";
 
         /* place associated socket fd into connections hash table */
         if (connections.find(nodes[i]) == connections.end()) { //same as connections.contains(node), but contains only available for c++20 
@@ -111,3 +110,8 @@ int Node::initiate_connections(int* nodes, std::string* hostnames, int* ports, i
 
 void Node::become_active() { isActive = true; }
 void Node::become_passive() { isActive = false; }
+
+std::ostream& operator<<(std::ostream& os, const Node& node) {
+    os << "Node(hostname=" << node.hostname << ", port=" << node.port << ")\n";
+    return os;
+}

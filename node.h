@@ -23,6 +23,7 @@ public:
     void become_active();
     void become_passive();
     void send_message(const std::string&);
+    friend std::ostream& operator<<(std::ostream& os, const Node& node);
 };
 
 #endif
