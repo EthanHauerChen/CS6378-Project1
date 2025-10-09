@@ -6,5 +6,6 @@
 #include "config_parser.h"
 
 int main(int argc, char ** argv) {
-    extract_config
+    struct config node_values;
+    std::cout << "error: " << extract_config(argv[1], node_values) << "\n";
 }

@@ -1,4 +1,10 @@
 #include <string>
+#include <vector>
+
+struct neighbor {
+    std::string hostname;
+    int port;
+};
 
 struct config {
     int nodes, minPerActive, maxPerActive;
@@ -7,6 +13,7 @@ struct config {
     
     std::string hostname;
     int port;
+    std::vector<neighbor> neighbors;
 };
 
-config extract_config(std::string filename);
+int extract_config(std::string filename, config& values);
