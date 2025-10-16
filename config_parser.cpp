@@ -5,6 +5,7 @@
 #include <iostream>
 #include <vector>
 #include <unistd.h>
+#include <ostream>
 
 /* taken from https://stackoverflow.com/questions/14265581/parse-split-a-string-in-c-using-string-delimiter-standard-c */
 std::vector<std::string> split(const std::string& str, const std::string& delimiter) {
@@ -110,19 +111,46 @@ int extract_config(std::string filename, config& values) {
             }
             std::vector<std::string> tokens = split(line, " ");
             std::cout << tokens.size() << "\n";
-            if (tokens.size() > values.nodes - 1) {
-                fprintf(stderr, "config file does not contain the correct number of tokens on the first valid line\n");
-                return -4;
-            }
+            // if (tokens.size() > values.nodes - 1) {
+            //     fprintf(stderr, "config file does not contain the correct number of tokens on the first valid line\n");
+            //     return -4;
+            // }
             for (int i = 0; i < tokens.size(); i++) {
                 if (!(isdigit(tokens[i][0]) && (num = tokens[i][0] - '0') >= 0)) break; //if token on the line is not a number, that means it must be invalid or a comment
                 int neighbor_num = std::stoi(tokens[i]);
                 std::vector<std::string> node_tokens = split(hosts_ports[neighbor_num], " ");
-                values.neighbors[i].hostname = node_tokens[1] + ".utdallas.edu"; //use localhost when testing locally
-                values.neighbors[i].port = std::stoi(node_tokens[2]);
+
+                std::string hostn = node_tokens[1] + ".utdallas.edu"; //hostname, use localhost when testing locally
+                int port = std::stoi(node_tokens[2]); //port
+                values.neighbors.push_back({hostn, port});
+                //values.neighbors.emplace_back(hostn, port); Doesn't work, emplace uses constructor which neighbor struct does not have
+                // values.neighbors[i].hostname = node_tokens[1] + ".utdallas.edu"; //use localhost when testing locally
+                // values.neighbors[i].port = std::stoi(node_tokens[2]);
             }
+            break; //successfully read the line containing this node's neighbors
         }
     }
 
     return 0;
+}
+
+std::ostream& operator<<(std::ostream &strm, const config &c) {
+    //I FUCKING HATE C++
+    std::string neighbors = "[";
+    for (neighbor n : c.neighbors) {
+        neighbors += std::string("(hostname:") + n.hostname +
+        std::string(", port:") + std::to_string(n.port) +
+        std::string("), ");
+    }
+    neighbors += "]";
+    return strm << "config {\n\t" << 
+        "nodes: " << c.nodes << "\n\t" <<
+        "minPerActive: " << c.minPerActive << "\n\t" <<
+        "maxPerActive: " << c.maxPerActive << "\n\t" <<
+        "minSendDelay: " << c.minSendDelay << "\n\t" <<
+        "snapshotDelay: " << c.snapshotDelay << "\n\t" <<
+        "maxNumber: " << c.maxNumber << "\n\t" <<
+        "hostname: " << c.hostname << "\n\t" <<
+        "port: " << c.port << "\n\t" <<
+        "neighbors: " << neighbors << "\n}\n";
 }
