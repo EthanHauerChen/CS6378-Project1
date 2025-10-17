@@ -4,6 +4,7 @@
 #include <string>
 #include <sys/socket.h>
 #include <vector>
+#include "config_parser.h"
 
 class Node {
     int node_number;
@@ -22,7 +23,7 @@ public:
     int listen_for_connections(int);
     int initiate_connections(int[], std::string[], int[], int);
     /************************************************************ */
-    int setup(); //likely need to pass args needed for above 2 functions, maybe as a struct
+    int setup(const config& node_info); //likely need to pass args needed for above 2 functions, maybe as a struct
     void become_active();
     void become_passive();
     void send_message(const std::string&);

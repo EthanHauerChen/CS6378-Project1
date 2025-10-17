@@ -8,9 +8,10 @@
 #include <thread>
 #include <chrono>
 
-Node::Node(std::string hostname, int port) {
-    this->hostname = hostname;
-    this->port = port;
+Node::Node(const config& node_info) {
+    node_info.hostname = hostname;
+    node_info.port = port;
+    setup(node_info);
 }
 
 int Node::listen_for_connections(int num_neighbors) { 
@@ -106,6 +107,10 @@ int Node::initiate_connections(int* nodes, std::string* hostnames, int* ports, i
     }
 
     return 1; //success
+}
+
+int setup(const config& node_info) {
+    std::thread(listen_for_connections, )
 }
 
 void Node::become_active() { isActive = true; }
