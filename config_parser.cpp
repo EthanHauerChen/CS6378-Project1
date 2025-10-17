@@ -48,7 +48,7 @@ int extract_config(std::string filename, config& values) {
         if (isdigit(line[0]) && (num = line[0] - '0') >= 0) { //ensure current line is a valid line
             //std::cout << line << "\n";
             std::vector<std::string> tokens = split(line, " ");
-            std::cout << tokens.size() << "\n";
+            //std::cout << tokens.size() << "\n";
             if (tokens.size() != 6) {
                 fprintf(stderr, "config file does not contain the correct number of tokens on the first valid line\n");
                 return -2;
@@ -59,7 +59,7 @@ int extract_config(std::string filename, config& values) {
             values.minSendDelay = std::stol(tokens[3]);
             values.snapshotDelay = std::stol(tokens[4]);
             values.maxNumber = std::stoi(tokens[5]);
-            std::cout << "before break" << "\n";
+            //std::cout << "before break" << "\n";
             break;
         }
     }
