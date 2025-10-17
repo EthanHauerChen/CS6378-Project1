@@ -110,7 +110,12 @@ int Node::initiate_connections(int* nodes, std::string* hostnames, int* ports, i
 }
 
 int setup(const config& node_info) {
-    //std::thread(listen_for_connections, )
+    int neighbors[node_info.neighbors.size()];
+    for (int i = 0; i < node_info.neighbors.size(); i++) {
+        neighbors[i] = node_info.neighbors[i].
+    }
+    std::thread(listen_for_connections, node_info.neighbors.size());
+    std::thread(initiate_connections, )
     return 0;
 }
 
