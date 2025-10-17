@@ -4,6 +4,7 @@
 struct neighbor {
     std::string hostname;
     int port;
+    int nodenum;
 };
 
 struct config {

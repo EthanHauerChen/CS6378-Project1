@@ -126,7 +126,7 @@ int extract_config(std::string filename, config& values) {
 
                 std::string hostn = node_tokens[1] + ".utdallas.edu"; //hostname, use localhost when testing locally
                 int port = std::stoi(node_tokens[2]); //port
-                values.neighbors.push_back({hostn, port});
+                values.neighbors.push_back({hostn, port, neighbor_num});
                 //values.neighbors.emplace_back(hostn, port); Doesn't work, emplace uses constructor which neighbor struct does not have
                 // values.neighbors[i].hostname = node_tokens[1] + ".utdallas.edu"; //use localhost when testing locally
                 // values.neighbors[i].port = std::stoi(node_tokens[2]);
