@@ -46,7 +46,7 @@ int extract_config(std::string filename, config& values) {
     while (getline(configFile, line)) {
         int num;
         if (isdigit(line[0]) && (num = line[0] - '0') >= 0) { //ensure current line is a valid line
-            std::cout << line << "\n";
+            //std::cout << line << "\n";
             std::vector<std::string> tokens = split(line, " ");
             std::cout << tokens.size() << "\n";
             if (tokens.size() != 6) {
@@ -72,21 +72,21 @@ int extract_config(std::string filename, config& values) {
         getline(configFile, line);
         int num;
         if (isdigit(line[0]) && (num = line[0] - '0') >= 0) { //ensure current line is a valid line
-            std::cout << line << "\n";
+            //std::cout << line << "\n";
             std::vector<std::string> tokens = split(line, " ");
-            std::cout << tokens[0][0] << " " << tokens[1][0] << "\n";
-            std::cout << tokens.size() << "\n";
-            std::cout << "hi";
+            // std::cout << tokens[0][0] << " " << tokens[1][0] << "\n";
+            // std::cout << tokens.size() << "\n";
+            // std::cout << "hi";
 
             //remove all tokens starting from '#'
             int i = 0;
             while (i < tokens.size() && tokens[i][0] != '#') {
-                std::cout << i << ", ";
+                //std::cout << i << ", ";
                 i++;
             }
-            std::cout << "\n";
+            //std::cout << "\n";
             tokens.resize(i);
-            std::cout << "new tokens size: " << tokens.size() << "\n";
+            //std::cout << "new tokens size: " << tokens.size() << "\n";
             if (tokens.size() != 3) {
                 fprintf(stderr, "config file does not contain the correct number of tokens on the first valid line\n");
                 return -3;
@@ -94,7 +94,7 @@ int extract_config(std::string filename, config& values) {
             hosts_ports[valid_lines_read] = line;
 
             if (strstr(hostname, tokens[1].c_str())) { //if current line contains the machine's hostname
-                std::cout << "hostname: " << hostname << "\n";
+                //std::cout << "hostname: " << hostname << "\n";
                 values.port = std::stoi(tokens[2]);
                 node_num = valid_lines_read;
             }
@@ -108,13 +108,13 @@ int extract_config(std::string filename, config& values) {
         getline(configFile, line);
         int num;
         if (isdigit(line[0]) && (num = line[0] - '0') >= 0) { //ensure current line is a valid line
-            std::cout << line << "\n";
+            //std::cout << line << "\n";
             if (!valid_lines_read == node_num) {
                 valid_lines_read++;
                 continue;
             }
             std::vector<std::string> tokens = split(line, " ");
-            std::cout << tokens.size() << "\n";
+            //std::cout << tokens.size() << "\n";
             // if (tokens.size() > values.nodes - 1) {
             //     fprintf(stderr, "config file does not contain the correct number of tokens on the first valid line\n");
             //     return -4;
