@@ -18,7 +18,7 @@ class Node {
     std::unordered_map<int, Connection> connections;
 
 public:
-    Node(const& config);
+    Node(const config&);
     /** make private, called using setup() function */
     int listen_for_connections(int);
     int initiate_connections(int[], std::string[], int[], int);
