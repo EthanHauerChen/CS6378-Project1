@@ -23,14 +23,18 @@ std::vector<std::string> split(const std::string& str, const std::string& delimi
     return tokens;
 }
 
+/** TODO: make sure 'values' parameter is only altered at the very end of the function
+ * when it isn't possible to "error out" and return early, resulting in a partially completed
+ * config struct
+ */
 int extract_config(std::string filename, config& values) {
     std::ifstream configFile(filename);
     /****** UNCOMMENT WHEN TESTING ON DC SERVERS */
-    // char hostname[1024];
-    // hostname[1023] = '\0';
-    // gethostname(hostname, 1023);
-    // values.hostname = hostname;
-    char* hostname = "dc02.utdallas.edu";
+    char hostname[1024];
+    hostname[1023] = '\0';
+    gethostname(hostname, 1023);
+    values.hostname = hostname;
+    //char* hostname = "dc02.utdallas.edu";
 
     if (!configFile.is_open()) {
         fprintf(stderr, "unable to open file: %s\n", filename);
