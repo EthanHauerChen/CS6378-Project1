@@ -110,7 +110,8 @@ int Node::initiate_connections(int* nodes, std::string* hostnames, int* ports, i
 }
 
 int setup(const config& node_info) {
-    std::thread(listen_for_connections, )
+    //std::thread(listen_for_connections, )
+    return 0;
 }
 
 void Node::become_active() { isActive = true; }
