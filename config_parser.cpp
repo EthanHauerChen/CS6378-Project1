@@ -37,7 +37,7 @@ int extract_config(std::string filename, config& values) {
     //char* hostname = "dc02.utdallas.edu";
 
     if (!configFile.is_open()) {
-        fprintf(stderr, "unable to open file: %s\n", filename);
+        fprintf(stderr, "unable to open file: %s\n", filename.c_str());
         return -1;
     }
 
