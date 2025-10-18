@@ -120,8 +120,8 @@ int setup(const config& node_info) {
         ports[i] = node_info.neighbors[i].port;
     }
 
-    std::thread l(listen_for_connections, node_info.neighbors.size());
-    std::thread c(initiate_connections, neighbors, hostnames, ports, size);
+    std::thread l(Node::listen_for_connections, node_info.neighbors.size());
+    std::thread c(Node::initiate_connections, neighbors, hostnames, ports, size);
     l.join();
     c.join();
     return 0;
