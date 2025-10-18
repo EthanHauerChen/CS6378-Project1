@@ -117,7 +117,7 @@ int setup(const config& node_info) {
     for (int i = 0; i < size; i++) {
         neighbors[i] = node_info.neighbors[i].nodenum;
         hostnames[i] = node_info.neighbors[i].hostname;
-        ports[i] = node_info.neighbors[i].ports;
+        ports[i] = node_info.neighbors[i].port;
     }
 
     std::thread l(listen_for_connections, node_info.neighbors.size());
