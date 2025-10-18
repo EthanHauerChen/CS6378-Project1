@@ -111,9 +111,10 @@ int Node::initiate_connections(int* nodes, std::string* hostnames, int* ports, i
 
 int Node::setup(const config& node_info) {
     int size = node_info.neighbors.size();
-    int neighbors[size];
-    std::string hostnames[size];
-    int ports[size];
+    //variable length arrays are not allowed in C++ standard so the following are vectors instead
+    std::vector<int> neighbors(size);
+    std::vector<std::string> hostnames(size);
+    std::vector<int> ports(size);
     for (int i = 0; i < size; i++) {
         neighbors[i] = node_info.neighbors[i].nodenum;
         hostnames[i] = node_info.neighbors[i].hostname;
