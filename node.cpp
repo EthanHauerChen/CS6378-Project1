@@ -110,12 +110,20 @@ int Node::initiate_connections(int* nodes, std::string* hostnames, int* ports, i
 }
 
 int setup(const config& node_info) {
-    int neighbors[node_info.neighbors.size()];
-    for (int i = 0; i < node_info.neighbors.size(); i++) {
-        neighbors[i] = node_info.neighbors[i].
+    int size = node_info.neighbors.size();
+    int neighbors[size];
+    std::string hostnames[size];
+    int ports[size];
+    for (int i = 0; i < size; i++) {
+        neighbors[i] = node_info.neighbors[i].nodenum;
+        hostnames[i] = node_info.neighbors[i].hostname;
+        ports[i] = node_info.neighbors[i].ports;
     }
-    std::thread(listen_for_connections, node_info.neighbors.size());
-    std::thread(initiate_connections, )
+
+    std::thread l(listen_for_connections, node_info.neighbors.size());
+    std::thread c(initiate_connections, neighbors, hostnames, ports, size);
+    l.join();
+    c.join();
     return 0;
 }
 
