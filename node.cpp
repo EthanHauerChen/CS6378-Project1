@@ -120,8 +120,8 @@ int Node::setup(const config& node_info) {
         ports[i] = node_info.neighbors[i].port;
     }
 
-    std::thread l(this->Node::listen_for_connections, size);
-    std::thread c(this->Node::initiate_connections, neighbors, hostnames, ports, size);
+    std::thread l(&Node::listen_for_connections, this, size); //runnable func needs to be non-static, therefore use pointer to function as arg0, pointer to obj the function belongs to as arg1
+    std::thread c(&Node::initiate_connections, this, neighbors, hostnames, ports, size);
     l.join();
     c.join();
     return 0;
