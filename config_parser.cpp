@@ -144,7 +144,7 @@ std::ostream& operator<<(std::ostream &strm, const config &c) {
     for (neighbor n : c.neighbors) {
         neighbors += std::string("(hostname:") + n.hostname +
         std::string(", port:") + std::to_string(n.port) +
-        std::string(", node #: ") + 
+        std::string(", node #: ") + std::to_string(n.nodenum) + 
         std::string("), ");
     }
     neighbors += "]";
