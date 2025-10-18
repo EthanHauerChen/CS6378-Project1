@@ -22,3 +22,5 @@ struct config {
 std::ostream& operator<<(std::ostream &strm, const config &c);
 
 int extract_config(std::string filename, config& values);
+
+#endif
