@@ -82,14 +82,17 @@ int Node::initiate_connections(int* nodes, std::string* hostnames, int* ports, i
         address.sin_family = AF_INET;
         address.sin_port = htons(ports[i]);
         host = gethostbyname(hostnames[i].c_str());
+        std::cout << "connecting to hostname: " << hostnames[i] << ", port: " << ports[i] << "/n";
         
         if (!host) {
             fprintf(stderr, "error: unknown host %s\n", hostnames[i].c_str());
             return -2;
         }
         memcpy(&address.sin_addr, host->h_addr_list[0], host->h_length);
-        while (connect(sockfd, (struct sockaddr *)&address, sizeof(address)) != 0) {
+        int counter = 0; //quit connection attempt after 10 times
+        while (connect(sockfd, (struct sockaddr *)&address, sizeof(address)) != 0 || counter > 10) {
             fprintf(stderr, "error: cannot connect to host %s\n", hostnames[i].c_str());
+            counter++;
             std::this_thread::sleep_for(std::chrono::seconds(1));
         }
         std::cout << "Connected to server " << hostnames[i] << ":" << ports[i] << "\n";
