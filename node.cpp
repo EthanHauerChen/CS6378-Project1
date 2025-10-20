@@ -7,16 +7,22 @@
 #include <iostream>
 #include <thread>
 #include <chrono>
+#include <random>
 
 Node::Node(const config& node_info) {
     this->node_number = node_info.node_num;
     this->hostname = node_info.hostname;
     this->port = node_info.port;
+    this->maxNumber = node_info.maxNumber;
+    this->minPerActive = node_info.minPerActive;
+    this->maxPerActive = node_info.maxPerActive;
+    this->minSendDelay = node_info.minSendDelay;
     std::cout << "Node setup {\n\t" << 
     "Node number: " << node_number << "\n\t" <<
     "hostname: " << hostname << "\n\t" <<
     "port: " << port << "\n}\n";
-    setup(node_info);
+    if (setup(node_info) > -1)
+        begin_MAP();
 }
 
 int Node::listen_for_connections(int num_neighbors) { 
@@ -63,7 +69,7 @@ int Node::listen_for_connections(int num_neighbors) {
                 connections.insert({node, {connection_fd, -1}});
             }
             else {
-                connections.find(node)->second.read_fd = connection_fd;
+                connections.find(node)->second.read_fd = connection_fd; //find returns an iterator that points to std::pair, and the struct is the second of the pair, hence second.read_fd
             }
         }
     }
@@ -139,6 +145,39 @@ int Node::setup(const config& node_info) {
 
 void Node::become_active() { isActive = true; }
 void Node::become_passive() { isActive = false; }
+
+void send_message(int node, int msg_type, std::string msg) {
+    if (msg_type == 0) { //MAP protocol message. ie, application message
+        int sockfd = connections.find(node)->second.write_fd;
+        int message = htonl(0);
+        write(sockfd, &message, sizeof(int));
+    }
+    else {
+        //Chandy-Lamport message. ie, control message
+    }
+}
+
+void begin_MAP() {
+    std::random_device rd;  // a seed source for the random number engine
+    std::mt19937 gen(rd()); // mersenne_twister_engine seeded with rd()
+    std::uniform_int_distribution<> num_messages(this->minPerActive, this->maxPerActive);
+    std::uniform_int_distribution<> nodes(0, (this->connections).size() - 1);
+    std::vector<Connection> temp_connections();
+    for (const auto& pair : this->connections) temp_connections.push_back(pair.first); //in order to random access nodes to send messages to, construct vector of node_nums
+
+    int messages_sent = 0;
+    while (messages_sent < this->maxNumber) {
+        if ((this->isActive)) {
+            int num = num_messages(gen);
+            for (int i = 0; i < num_messages; i++) {
+                int node_num = temp_connections[nodes(gen)];
+                send_message(node_num, 0, "");
+                std::this_thread::sleep_for(std::chrono::milliseconds(this->minSendDelay));
+            }
+            
+        }
+    }
+}
 
 std::ostream& operator<<(std::ostream& os, const Node& node) {
     os << "Node(hostname=" << node.hostname << ", port=" << node.port << ")\n";

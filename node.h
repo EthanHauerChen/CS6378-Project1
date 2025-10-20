@@ -10,6 +10,9 @@ class Node {
     int node_number;
     std::string hostname;
     int port;
+    int maxNumber;
+    int minPerActive, maxPerActive;
+    long minSendDelay;
     bool isActive;
     struct Connection {
         int read_fd;
@@ -19,6 +22,8 @@ class Node {
     int listen_for_connections(int);
     int initiate_connections(int[], std::string[], int[], int);
     int setup(const config& node_info);
+    void send_message(int node, int msg_type, std::string msg);
+    void begin_MAP();
 
 public:
     Node(const config&);
