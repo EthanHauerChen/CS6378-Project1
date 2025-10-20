@@ -102,6 +102,7 @@ int extract_config(std::string filename, config& values) {
         }
     }
 
+    std::cout << "node_num = " << node_num << "\n";
     /* scan final n lines */
     valid_lines_read = 0;
     while (valid_lines_read < values.nodes) {
