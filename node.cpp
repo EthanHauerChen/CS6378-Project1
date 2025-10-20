@@ -9,7 +9,7 @@
 #include <chrono>
 
 Node::Node(const config& node_info) {
-    this->node_num = node_info.node_num;
+    this->node_number = node_info.node_num;
     this->hostname = node_info.hostname;
     this->port = node_info.port;
     setup(node_info);
