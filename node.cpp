@@ -151,9 +151,9 @@ int Node::setup(const config& node_info) {
 void Node::become_active() { isActive = true; }
 void Node::become_passive() { isActive = false; }
 
-void send_message(int node, int msg_type, std::string msg) {
+void Node::send_message(int node, int msg_type, std::string msg) {
     if (msg_type == 0) { //MAP protocol message. ie, application message
-        int sockfd = connections.find(node)->second.write_fd;
+        int sockfd = (this->connections).find(node)->second.write_fd;
         int message = htonl(0);
         write(sockfd, &message, sizeof(int));
     }
@@ -162,7 +162,7 @@ void send_message(int node, int msg_type, std::string msg) {
     }
 }
 
-void begin_MAP() {
+void Node::begin_MAP() {
     std::random_device rd;  // a seed source for the random number engine
     std::mt19937 gen(rd()); // mersenne_twister_engine seeded with rd()
     std::uniform_int_distribution<> num_messages(this->minPerActive, this->maxPerActive);
