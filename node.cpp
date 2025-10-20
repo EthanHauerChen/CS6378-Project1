@@ -56,7 +56,7 @@ int Node::listen_for_connections(int num_neighbors) {
             /* determine which node has connected */
             int node;
             read(connection_fd, &node, sizeof(int));
-            std::cout << "Connected to client with node: " << node << "\n";
+            std::cout << "Server " << node_num << " connected with Client " << node << "\n";
 
             /* place associated socket fd into connections hash table */
             if (connections.find(node) == connections.end()) { //same as connections.contains(node), but contains only available for c++20 
@@ -87,7 +87,7 @@ int Node::initiate_connections(int* nodes, std::string* hostnames, int* ports, i
         address.sin_family = AF_INET;
         address.sin_port = htons(ports[i]);
         host = gethostbyname(hostnames[i].c_str());
-        std::cout << "connecting to hostname: " << hostnames[i] << ", port: " << ports[i] << "\n" << std::flush;
+        std::cout << "Client " << node_num << " connecting to hostname: " << hostnames[i] << ", port: " << ports[i] << "\n" << std::flush;
         
         if (!host) {
             fprintf(stderr, "error: unknown host %s\n", hostnames[i].c_str());
@@ -101,7 +101,7 @@ int Node::initiate_connections(int* nodes, std::string* hostnames, int* ports, i
             if (counter > 15) return -3;
             std::this_thread::sleep_for(std::chrono::seconds(1));
         }
-        std::cout << "Connected to server " << hostnames[i] << ":" << ports[i] << "\n";
+        std::cout << "Client " << node_num << " connected to Server " << hostnames[i] << ":" << ports[i] << "\n";
 
         /* place associated socket fd into connections hash table */
         if (connections.find(nodes[i]) == connections.end()) { //same as connections.contains(node), but contains only available for c++20 
