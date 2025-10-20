@@ -51,7 +51,7 @@ int Node::listen_for_connections(int num_neighbors) {
             num_connections++;
             /* determine which node has connected */
             int node;
-            read(connection_fd, &connection_fd, sizeof(int));
+            read(connection_fd, &node, sizeof(int));
 
             /* place associated socket fd into connections hash table */
             if (connections.find(node) == connections.end()) { //same as connections.contains(node), but contains only available for c++20 

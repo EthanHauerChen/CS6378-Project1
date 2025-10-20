@@ -15,7 +15,7 @@ class Node {
         int read_fd;
         int write_fd;
     };
-    std::unordered_map<int, Connection> connections;
+    std::unordered_map<int, Connection> connections; //each key is node number
     int listen_for_connections(int);
     int initiate_connections(int[], std::string[], int[], int);
     int setup(const config& node_info);
