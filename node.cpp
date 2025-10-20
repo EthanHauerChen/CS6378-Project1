@@ -12,6 +12,10 @@ Node::Node(const config& node_info) {
     this->node_number = node_info.node_num;
     this->hostname = node_info.hostname;
     this->port = node_info.port;
+    std::cout << "Node setup {\n\t" << 
+    "Node number: " << "\n\t" <<
+    "hostname: " << "\n\t" <<
+    "port: " << "\n}";
     setup(node_info);
 }
 
@@ -94,7 +98,7 @@ int Node::initiate_connections(int* nodes, std::string* hostnames, int* ports, i
         while (connect(sockfd, (struct sockaddr *)&address, sizeof(address)) != 0) {
             fprintf(stderr, "error: cannot connect to host %s\n", hostnames[i].c_str());
             counter++;
-            if (counter > 30) return -3;
+            if (counter > 15) return -3;
             std::this_thread::sleep_for(std::chrono::seconds(1));
         }
         std::cout << "Connected to server " << hostnames[i] << ":" << ports[i] << "\n";
