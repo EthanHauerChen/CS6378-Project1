@@ -97,6 +97,7 @@ int extract_config(std::string filename, config& values) {
                 std::cout << "hostname: " << hostname << ", tokens[1] = " << tokens[1] << ", valid_lines_read = " << valid_lines_read << "\n";
                 values.port = std::stoi(tokens[2]);
                 node_num = valid_lines_read;
+                values.node_num = node_num;
             }
             valid_lines_read++;
         }

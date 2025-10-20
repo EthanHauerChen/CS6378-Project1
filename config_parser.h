@@ -10,6 +10,7 @@ struct neighbor {
 };
 
 struct config {
+    int node_num;
     int nodes, minPerActive, maxPerActive;
     long minSendDelay, snapshotDelay; 
     int maxNumber;
