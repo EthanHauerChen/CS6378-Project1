@@ -8,6 +8,7 @@
 #include <thread>
 #include <chrono>
 #include <random>
+#include <fcntl.h>
 
 Node::Node(const config& node_info) {
     this->node_number = node_info.node_num;
@@ -63,6 +64,10 @@ int Node::listen_for_connections(int num_neighbors) {
             int node;
             read(connection_fd, &node, sizeof(int));
             std::cout << "Server " << node_number << " connected with Client " << node << "\n";
+
+            /* change read_fd to be nonblocking */
+            int flags = fcntl(connection_fd, F_GETFL, 0);
+            fcntl(connection_fd, F_SETFL, flags | O_NONBLOCK);
 
             /* place associated socket fd into connections hash table */
             if (connections.find(node) == connections.end()) { //same as connections.contains(node), but contains only available for c++20 
@@ -172,9 +177,14 @@ void begin_MAP() {
             for (int i = 0; i < num_messages; i++) {
                 int node_num = temp_connections[nodes(gen)];
                 send_message(node_num, 0, "");
+                messages_sent++;
                 std::this_thread::sleep_for(std::chrono::milliseconds(this->minSendDelay));
             }
-            
+            this->become_passive();
+        }
+        else {
+            //for each connection, check the read_fd to see if application message was received
+
         }
     }
 }
