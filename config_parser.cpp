@@ -110,7 +110,7 @@ int extract_config(std::string filename, config& values) {
         int num;
         if (isdigit(line[0]) && (num = line[0] - '0') >= 0) { //ensure current line is a valid line
             std::cout << line << "\n";
-            if (!valid_lines_read == node_num) {
+            if (!(valid_lines_read == node_num)) {
                 valid_lines_read++;
                 continue;
             }
