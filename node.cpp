@@ -82,7 +82,7 @@ int Node::initiate_connections(int* nodes, std::string* hostnames, int* ports, i
         address.sin_family = AF_INET;
         address.sin_port = htons(ports[i]);
         host = gethostbyname(hostnames[i].c_str());
-        std::cout << "connecting to hostname: " << hostnames[i] << ", port: " << ports[i] << "/n" << std::flush;
+        std::cout << "connecting to hostname: " << hostnames[i] << ", port: " << ports[i] << "\n" << std::flush;
         
         if (!host) {
             fprintf(stderr, "error: unknown host %s\n", hostnames[i].c_str());

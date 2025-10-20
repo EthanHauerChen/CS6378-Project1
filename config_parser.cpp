@@ -94,7 +94,7 @@ int extract_config(std::string filename, config& values) {
             hosts_ports[valid_lines_read] = line;
 
             if (strstr(hostname, tokens[1].c_str())) { //if current line contains the machine's hostname
-                //std::cout << "hostname: " << hostname << "\n";
+                std::cout << "hostname: " << hostname << ", tokens[1] = " << tokens[1] << ", valid_lines_read = " << valid_lines_read << "\n";
                 values.port = std::stoi(tokens[2]);
                 node_num = valid_lines_read;
             }
