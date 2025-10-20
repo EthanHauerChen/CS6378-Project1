@@ -108,7 +108,7 @@ int extract_config(std::string filename, config& values) {
         getline(configFile, line);
         int num;
         if (isdigit(line[0]) && (num = line[0] - '0') >= 0) { //ensure current line is a valid line
-            //std::cout << line << "\n";
+            std::cout << line << "\n";
             if (!valid_lines_read == node_num) {
                 valid_lines_read++;
                 continue;
@@ -122,6 +122,7 @@ int extract_config(std::string filename, config& values) {
             for (int i = 0; i < tokens.size(); i++) {
                 if (!(isdigit(tokens[i][0]) && (num = tokens[i][0] - '0') >= 0)) break; //if token on the line is not a number, that means it must be invalid or a comment
                 int neighbor_num = std::stoi(tokens[i]);
+                std::cout << "neighbor_num: " << neighbor_num << "\n";
                 std::vector<std::string> node_tokens = split(hosts_ports[neighbor_num], " ");
 
                 std::string hostn = node_tokens[1] + ".utdallas.edu"; //hostname, use localhost when testing locally
