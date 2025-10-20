@@ -47,11 +47,11 @@ int Node::listen_for_connections(int num_neighbors) {
         /* accept incoming connections */
         int connection_fd = accept(sockfd, NULL, NULL);
         if (connection_fd > 0) {
-            std::cout << "Connected to a client\n";
             num_connections++;
             /* determine which node has connected */
             int node;
             read(connection_fd, &node, sizeof(int));
+            std::cout << "Connected to client with node: " << node << "\n";
 
             /* place associated socket fd into connections hash table */
             if (connections.find(node) == connections.end()) { //same as connections.contains(node), but contains only available for c++20 
