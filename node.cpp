@@ -14,7 +14,7 @@ Node::Node(const config& node_info) {
     this->port = node_info.port;
     std::cout << "Node setup {\n\t" << 
     "Node number: " << node_number << "\n\t" <<
-    "hostname: " << << hostname << "\n\t" <<
+    "hostname: " << hostname << "\n\t" <<
     "port: " << port << "\n}";
     setup(node_info);
 }
