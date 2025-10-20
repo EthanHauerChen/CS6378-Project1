@@ -154,7 +154,7 @@ void Node::become_passive() { isActive = false; }
 void Node::send_message(int node, int msg_type, std::string msg) {
     if (msg_type == 0) { //MAP protocol message. ie, application message
         int sockfd = (this->connections).find(node)->second.write_fd;
-        int message = htonl(0);
+        int message = htonl(msg_type);
         write(sockfd, &message, sizeof(int));
     }
     else {
@@ -184,7 +184,9 @@ void Node::begin_MAP() {
         }
         else {
             //for each connection, check the read_fd to see if application message was received
-
+            for (const auto& pair : this->connections) {
+                int msg;
+            }
         }
     }
 }
