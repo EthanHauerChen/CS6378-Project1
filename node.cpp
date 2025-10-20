@@ -167,14 +167,14 @@ void Node::begin_MAP() {
     std::mt19937 gen(rd()); // mersenne_twister_engine seeded with rd()
     std::uniform_int_distribution<> num_messages(this->minPerActive, this->maxPerActive);
     std::uniform_int_distribution<> nodes(0, (this->connections).size() - 1);
-    std::vector<int> temp_connections();
+    std::vector<int> temp_connections;
     for (const auto& pair : this->connections) temp_connections.push_back(pair.first); //in order to random access nodes to send messages to, construct vector of node_nums
 
     int messages_sent = 0;
     while (messages_sent < this->maxNumber) {
         if ((this->isActive)) {
             int num = num_messages(gen);
-            for (int i = 0; i < num_messages; i++) {
+            for (int i = 0; i < num; i++) {
                 int node_num = temp_connections[nodes(gen)];
                 send_message(node_num, 0, "");
                 messages_sent++;
