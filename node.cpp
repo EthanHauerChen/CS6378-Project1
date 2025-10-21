@@ -252,7 +252,7 @@ void Node::begin_MAP() {
                     std::cout << msg << " this is the message after read returns true\n" << std::flush;
                     std::vector<int> temp_clock = this->extract_clock(msg);
                     for (int i = 0; i < this->clock.size(); i++) {
-                        (this->clock)[i] = std::max(clock[i], temp_clock[i]);
+                        (this->clock)[i] = std::max((this->clock)[i], temp_clock[i]);
                     }
                     (this->clock)[this->node_number]++;
                     std::cout << "Node " << this->node_number << " received message [" << msg << "] from: " << pair.first << "\n" << std::flush;
