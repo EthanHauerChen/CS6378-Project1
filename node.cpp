@@ -30,7 +30,7 @@ Node::Node(const config& node_info) {
     "hostname: " << hostname << "\n\t" <<
     "port: " << port << "\n}\n";
     if (setup(node_info) > -1) {
-        std::this_thread::sleep_for(std::chrono::seconds(10)); //wait for other processes to finish setup
+        std::this_thread::sleep_for(std::chrono::seconds(5)); //wait for other processes to finish setup
         begin_MAP();
     }
 }
@@ -169,7 +169,7 @@ void Node::send_message(int node, int msg_type, std::string msg) {
             vector_clock += std::to_string(i) + " ";
         }
         std::string message = "0 " + vector_clock;
-        write(sockfd, &message, sizeof(message));
+        write(sockfd, &message[0], sizeof(message));
     }
     else {
         //Chandy-Lamport message. ie, control message
