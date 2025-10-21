@@ -249,7 +249,7 @@ void Node::begin_MAP() {
                 std::string msg;
                 msg.reserve(msg_size);
                 if (this->read_nonblocking(pair.second.read_fd, &msg[0], msg_size)) { //if successful read of message
-                    std::cout << msg << "\n" << std::flush;
+                    std::cout << msg << " this is the message after read returns true\n" << std::flush;
                     std::vector<int> temp_clock = this->extract_clock(msg);
                     for (int i = 0; i < this->clock.size(); i++) {
                         (this->clock)[i] = std::max(clock[i], temp_clock[i]);
