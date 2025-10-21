@@ -215,6 +215,7 @@ void Node::begin_MAP() {
                 int msg;
                 if (this->read_nonblocking(pair.second.read_fd, &msg, sizeof(int))) { //if successful read of message
                     this->become_active();
+                    break;
                 }
             }
         }
