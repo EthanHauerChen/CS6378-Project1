@@ -197,7 +197,7 @@ bool Node::read_nonblocking(int fd, void* buf, size_t count) {
     }
 
     // If we reach here, full message has been read
-    std::memcpy(&buf, buffer, count);
+    std::memcpy(buf, buffer, count);
     return true;
 }
 
