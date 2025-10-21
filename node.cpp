@@ -12,6 +12,7 @@
 #include <random>
 #include <fcntl.h>
 #include <algorithm>
+#include <cstdio>
 
 
 Node::Node(const config& node_info) {
@@ -201,7 +202,8 @@ bool Node::read_nonblocking(int fd, void* buf, size_t count) {
 
     // If we reach here, full message has been read
     std::memcpy(buf, buffer, count);
-    std::cout << "true: " << &buf << "\n" << std::flush;
+    printf("true: %p\n", buf);
+    //std::cout << "true: " << &buf << "\n" << std::flush;
     return true;
 }
 
