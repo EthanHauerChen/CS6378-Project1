@@ -244,7 +244,7 @@ void Node::begin_MAP() {
             for (const auto& pair : this->connections) {
                 std::string msg;
                 msg.reserve(msg_size);
-                if (this->read_nonblocking(pair.second.read_fd, &msg, msg_size)) { //if successful read of message
+                if (this->read_nonblocking(pair.second.read_fd, &msg[0], msg_size)) { //if successful read of message
                     std::cout << msg << "\n" << std::flush;
                     std::vector<int> temp_clock = this->extract_clock(msg);
                     for (int i = 0; i < this->clock.size(); i++) {
