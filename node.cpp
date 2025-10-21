@@ -202,7 +202,12 @@ bool Node::read_nonblocking(int fd, void* buf, size_t count) {
 
     // If we reach here, full message has been read
     std::memcpy(buf, buffer, count);
-    printf("true: %s --- count = %d\n", buf, count);
+    printf("true: %s --- count = %d --- ", buf, count);
+    //print out each byte of buf as char to see if it was written properly
+    for (int i = 0; i < count; i++) {
+        std::cout << buf[i];
+    }
+    std::cout << "\n" << std::flush;
     //std::cout << "true: " << &buf << "\n" << std::flush;
     return true;
 }
