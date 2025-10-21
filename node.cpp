@@ -242,8 +242,10 @@ void Node::begin_MAP() {
         else {
             //for each connection, check the read_fd to see if application message was received
             for (const auto& pair : this->connections) {
-                std::string msg(msg_size, ' ');
+                std::string msg;
+                msg.reserve(msg_size);
                 if (this->read_nonblocking(pair.second.read_fd, &msg, msg_size)) { //if successful read of message
+                    std::cout << msg << "\n" << std::flush;
                     std::vector<int> temp_clock = this->extract_clock(msg);
                     for (int i = 0; i < this->clock.size(); i++) {
                         (this->clock)[i] = std::max(clock[i], temp_clock[i]);
