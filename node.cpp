@@ -19,6 +19,8 @@ Node::Node(const config& node_info) {
     this->maxPerActive = node_info.maxPerActive;
     this->minSendDelay = node_info.minSendDelay;
     this->isActive = false;
+    this->clock.reserve(node_info.neighbors.size() + 1);
+    for (int i : this->clock) i = 0; //initialize zeros initially
     std::cout << "Node setup {\n\t" << 
     "Node number: " << node_number << "\n\t" <<
     "hostname: " << hostname << "\n\t" <<

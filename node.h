@@ -14,6 +14,7 @@ class Node {
     int minPerActive, maxPerActive;
     long minSendDelay;
     bool isActive;
+    std::vector<int> clock;
     struct Connection {
         int read_fd;
         int write_fd;
