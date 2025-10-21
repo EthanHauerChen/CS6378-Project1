@@ -13,22 +13,6 @@
 #include <fcntl.h>
 #include <algorithm>
 
-/* taken from https://stackoverflow.com/questions/14265581/parse-split-a-string-in-c-using-string-delimiter-standard-c */
-std::vector<std::string> split(const std::string& str, const std::string& delimiter) {
-    std::vector<std::string> tokens;
-    std::string s = str;
-    size_t pos = 0;
-    std::string token;
-    while ((pos = s.find(delimiter)) != std::string::npos) {
-        token = s.substr(0, pos);
-        tokens.push_back(token);
-        s.erase(0, pos + delimiter.length());
-    }
-    tokens.push_back(s);
-
-    return tokens;
-}
-
 
 Node::Node(const config& node_info) {
     this->node_number = node_info.node_num;
