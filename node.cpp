@@ -18,6 +18,7 @@ Node::Node(const config& node_info) {
     this->minPerActive = node_info.minPerActive;
     this->maxPerActive = node_info.maxPerActive;
     this->minSendDelay = node_info.minSendDelay;
+    this->isActive = false;
     std::cout << "Node setup {\n\t" << 
     "Node number: " << node_number << "\n\t" <<
     "hostname: " << hostname << "\n\t" <<
