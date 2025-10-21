@@ -26,6 +26,7 @@ class Node {
     void send_message(int node, int msg_type, std::string msg);
     bool read_nonblocking(int fd, void* buf, size_t count);
     void begin_MAP();
+    std::vector<int> extract_clock(std::string); //gets the clock values from a message
 
 public:
     Node(const config&);

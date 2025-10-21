@@ -20,6 +20,8 @@ struct config {
     std::vector<neighbor> neighbors;
 };
 
+std::vector<std::string> split(const std::string& str, const std::string& delimiter); //equivalent of Java string.split()
+
 std::ostream& operator<<(std::ostream &strm, const config &c);
 
 int extract_config(std::string filename, config& values);

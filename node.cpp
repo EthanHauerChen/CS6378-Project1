@@ -1,4 +1,6 @@
 #include "node.h"
+#include "config_parser.h"
+
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <unistd.h>
@@ -9,6 +11,8 @@
 #include <chrono>
 #include <random>
 #include <fcntl.h>
+#include <algorithm>
+
 
 Node::Node(const config& node_info) {
     this->node_number = node_info.node_num;
@@ -157,8 +161,13 @@ void Node::become_passive() { isActive = false; }
 void Node::send_message(int node, int msg_type, std::string msg) {
     if (msg_type == 0) { //MAP protocol message. ie, application message
         int sockfd = (this->connections).find(node)->second.write_fd;
-        int message = htonl(msg_type);
-        write(sockfd, &message, sizeof(int));
+        std::string vector_clock = "";
+        (this->clock)[node_number]++;
+        for (int i : this->clock) {
+            vector_clock += std::to_string(i) + " ";
+        }
+        std::string message = "0 " + vector_clock;
+        write(sockfd, &message, sizeof(message));
     }
     else {
         //Chandy-Lamport message. ie, control message
@@ -192,6 +201,15 @@ bool Node::read_nonblocking(int fd, void* buf, size_t count) {
     return true;
 }
 
+std::vector<int> Node::extract_clock(std::string msg) {
+    std::vector<std::string> tokens = split(msg, " ");
+    std::vector<int> clock_vals(tokens.size() - 1);
+    for (int i = 1; i < tokens.size(); i++) { //first token is msg_type, not part of vector clock
+        clock_vals[i - 1] = std::stoi(tokens[i]);
+    }
+    return clock_vals;
+}
+
 void Node::begin_MAP() {
     std::random_device rd;  // a seed source for the random number engine
     std::mt19937 gen(rd()); // mersenne_twister_engine seeded with rd()
@@ -199,6 +217,14 @@ void Node::begin_MAP() {
     std::uniform_int_distribution<> nodes(0, (this->connections).size() - 1);
     std::vector<int> temp_connections;
     for (const auto& pair : this->connections) temp_connections.push_back(pair.first); //in order to random access nodes to send messages to, construct vector of node_nums
+
+    //determine size of messages sent/received
+    std::string vector_clock = "";
+    for (int i : this->clock) {
+        vector_clock += std::to_string(i) + " ";
+    }
+    std::string temp = "0 " + vector_clock;
+    int msg_size = sizeof(temp);
 
     int messages_sent = 0;
     while (messages_sent < this->maxNumber) {
@@ -216,8 +242,13 @@ void Node::begin_MAP() {
         else {
             //for each connection, check the read_fd to see if application message was received
             for (const auto& pair : this->connections) {
-                int msg;
-                if (this->read_nonblocking(pair.second.read_fd, &msg, sizeof(int))) { //if successful read of message
+                std::string msg;
+                if (this->read_nonblocking(pair.second.read_fd, &msg, msg_size)) { //if successful read of message
+                    std::vector<int> temp_clock = this->extract_clock(msg);
+                    for (int i = 0; i < this->clock.size(); i++) {
+                        (this->clock)[i] = max(clock[i], temp_clock[i]);
+                    }
+                    (this->clock)[i]++;
                     std::cout << "Node " << this->node_number << " received message from: " << pair.first << "\n" << std::flush;
                     this->become_active();
                     break;
