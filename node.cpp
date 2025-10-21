@@ -205,6 +205,7 @@ void Node::begin_MAP() {
                 int node_num = temp_connections[nodes(gen)];
                 send_message(node_num, 0, "");
                 messages_sent++;
+                std::cout << "Sent message to: " << node_num << ", from: " << this->node_number << "\n" << std::flush;
                 std::this_thread::sleep_for(std::chrono::milliseconds(this->minSendDelay));
             }
             this->become_passive();
@@ -214,6 +215,7 @@ void Node::begin_MAP() {
             for (const auto& pair : this->connections) {
                 int msg;
                 if (this->read_nonblocking(pair.second.read_fd, &msg, sizeof(int))) { //if successful read of message
+                    std::cout << "Node " << this->node_number << " received message from: " << pair.first << "\n" << std::flush;
                     this->become_active();
                     break;
                 }
