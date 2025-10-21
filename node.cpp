@@ -162,6 +162,33 @@ void Node::send_message(int node, int msg_type, std::string msg) {
     }
 }
 
+bool Node::read_nonblocking(int fd, void* buf, size_t count) {
+    int bytes_read = 0;
+    unsigned char buffer[count];
+
+    while (bytes_read < (int)count) {
+        int n = read(sockfd, buffer + bytes_read, count - bytes_read);
+
+        if (n > 0) {
+            bytes_read += n;
+        } 
+        else {
+            // n < 0, Error or no data
+            if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                return false; // No data right now, just return and try again later
+            } 
+            else {
+                std::cerr << "Read error: " << strerror(errno) << "\n";
+                return false;
+            }
+        }
+    }
+
+    // If we reach here, full message has been read
+    std::memcpy(&buf, buffer, count);
+    return true;
+}
+
 void Node::begin_MAP() {
     std::random_device rd;  // a seed source for the random number engine
     std::mt19937 gen(rd()); // mersenne_twister_engine seeded with rd()
@@ -186,9 +213,13 @@ void Node::begin_MAP() {
             //for each connection, check the read_fd to see if application message was received
             for (const auto& pair : this->connections) {
                 int msg;
+                if (this->read_nonblocking(pair.second.read_fd, &msg, sizeof(int))) { //if successful read of message
+                    this->become_active();
+                }
             }
         }
     }
+    this->become_passive();
 }
 
 std::ostream& operator<<(std::ostream& os, const Node& node) {

@@ -23,6 +23,7 @@ class Node {
     int initiate_connections(int[], std::string[], int[], int);
     int setup(const config& node_info);
     void send_message(int node, int msg_type, std::string msg);
+    bool read_nonblocking(int fd, void* buf, size_t count);
     void begin_MAP();
 
 public:
