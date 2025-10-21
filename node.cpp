@@ -23,7 +23,7 @@ Node::Node(const config& node_info) {
     this->maxPerActive = node_info.maxPerActive;
     this->minSendDelay = node_info.minSendDelay;
     this->isActive = true;
-    this->clock = std::vector<int>(node_info.neighbors.size() - 1, 0); //initialize all 0s
+    this->clock = std::vector<int>(node_info.nodes, 0); //initialize all 0s
     std::cout << "Node setup {\n\t" << 
     "Node number: " << node_number << "\n\t" <<
     "hostname: " << hostname << "\n\t" <<
