@@ -170,7 +170,7 @@ void Node::send_message(int node, int msg_type, std::string msg) {
         }
         std::string message = "0 " + vector_clock;
         std::cout << "message being sent: " << message << "\n" << std::flush;
-        write(sockfd, &message[0], sizeof(message));
+        write(sockfd, &message[0], sizeof(char) * (message.size() + 1));
     }
     else {
         //Chandy-Lamport message. ie, control message
