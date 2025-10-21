@@ -246,9 +246,9 @@ void Node::begin_MAP() {
                 if (this->read_nonblocking(pair.second.read_fd, &msg, msg_size)) { //if successful read of message
                     std::vector<int> temp_clock = this->extract_clock(msg);
                     for (int i = 0; i < this->clock.size(); i++) {
-                        (this->clock)[i] = max(clock[i], temp_clock[i]);
+                        (this->clock)[i] = std::max(clock[i], temp_clock[i]);
                     }
-                    (this->clock)[i]++;
+                    (this->clock)[this->node_number]++;
                     std::cout << "Node " << this->node_number << " received message from: " << pair.first << "\n" << std::flush;
                     this->become_active();
                     break;
