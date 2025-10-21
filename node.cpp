@@ -166,6 +166,7 @@ void Node::send_message(int node, int msg_type, std::string msg) {
         std::string vector_clock = "";
         (this->clock)[node_number]++;
         for (int i : this->clock) {
+            std::cout << i << ", ";
             vector_clock += std::to_string(i) + " ";
         }
         std::string message = "0 " + vector_clock;
