@@ -249,7 +249,7 @@ void Node::begin_MAP() {
                         (this->clock)[i] = std::max(clock[i], temp_clock[i]);
                     }
                     (this->clock)[this->node_number]++;
-                    std::cout << "Node " << this->node_number << " received message from: " << pair.first << "\n" << std::flush;
+                    std::cout << "Node " << this->node_number << " received message [" << msg << "] from: " << pair.first << "\n" << std::flush;
                     this->become_active();
                     break;
                 }
