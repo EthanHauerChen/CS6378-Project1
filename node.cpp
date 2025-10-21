@@ -169,7 +169,7 @@ void Node::send_message(int node, int msg_type, std::string msg) {
             vector_clock += std::to_string(i) + " ";
         }
         std::string message = "0 " + vector_clock;
-        std::cout << message << "\n" << std::flush;
+        std::cout << "message being sent: " << message << "\n" << std::flush;
         write(sockfd, &message[0], sizeof(message));
     }
     else {
