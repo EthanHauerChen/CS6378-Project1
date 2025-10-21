@@ -29,8 +29,10 @@ Node::Node(const config& node_info) {
     "Node number: " << node_number << "\n\t" <<
     "hostname: " << hostname << "\n\t" <<
     "port: " << port << "\n}\n";
-    if (setup(node_info) > -1)
+    if (setup(node_info) > -1) {
+        std::this_thread::sleep_for(std::chrono::seconds(10)); //wait for other processes to finish setup
         begin_MAP();
+    }
 }
 
 int Node::listen_for_connections(int num_neighbors) { 
