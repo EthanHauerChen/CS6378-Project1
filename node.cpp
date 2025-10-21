@@ -167,7 +167,7 @@ bool Node::read_nonblocking(int fd, void* buf, size_t count) {
     unsigned char buffer[count];
 
     while (bytes_read < (int)count) {
-        int n = read(sockfd, buffer + bytes_read, count - bytes_read);
+        int n = read(fd, buffer + bytes_read, count - bytes_read);
 
         if (n > 0) {
             bytes_read += n;
