@@ -23,8 +23,7 @@ Node::Node(const config& node_info) {
     this->maxPerActive = node_info.maxPerActive;
     this->minSendDelay = node_info.minSendDelay;
     this->isActive = true;
-    this->clock.reserve(node_info.neighbors.size() + 1);
-    for (int i = 0; i < (this->clock).size(); i++) clock[i] = 0; //initialize zeros initially
+    this->clock = std::vector<int>(node_info.neighbors.size() - 1, 0); //initialize all 0s
     std::cout << "Node setup {\n\t" << 
     "Node number: " << node_number << "\n\t" <<
     "hostname: " << hostname << "\n\t" <<
@@ -165,9 +164,9 @@ void Node::send_message(int node, int msg_type, std::string msg) {
         int sockfd = (this->connections).find(node)->second.write_fd;
         std::string vector_clock = "";
         (this->clock)[node_number]++;
-        for (int i : this->clock) {
-            std::cout << i << ", ";
-            vector_clock += std::to_string(i) + " ";
+        for (int i = 0; i < (this->clock).size(); i++) {
+            std::cout << (this->clock)[i] << ", ";
+            vector_clock += std::to_string((this->clock)[i]) + " ";
         }
         std::string message = "0 " + vector_clock;
         std::cout << "message being sent: " << message << "\n" << std::flush;
