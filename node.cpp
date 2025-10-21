@@ -30,7 +30,7 @@ Node::Node(const config& node_info) {
     "hostname: " << hostname << "\n\t" <<
     "port: " << port << "\n}\n";
     if (setup(node_info) > -1) {
-        std::this_thread::sleep_for(std::chrono::seconds(10)); //wait for other processes to finish setup
+        
         begin_MAP();
     }
 }
@@ -233,6 +233,7 @@ void Node::begin_MAP() {
     }
     std::string temp = "0 " + vector_clock;
     int msg_size = sizeof(temp);
+    std::this_thread::sleep_for(std::chrono::seconds(10)); //wait for other processes to finish setup
 
     int messages_sent = 0;
     while (messages_sent < this->maxNumber) {
