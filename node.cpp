@@ -178,7 +178,7 @@ void Node::send_message(int node, int msg_type, std::string msg) {
     }
 }
 
-bool Node::read_nonblocking(int fd, void* buf, size_t count) {
+bool Node::read_nonblocking(int fd, std::string& buf, size_t count) {
     int bytes_read = 0;
     unsigned char buffer[count];
 
@@ -201,7 +201,7 @@ bool Node::read_nonblocking(int fd, void* buf, size_t count) {
     }
 
     // If we reach here, full message has been read
-    std::memcpy(buf, buffer, count);
+    buf = std::string(buffer);
     printf("true: %s --- count = %d --- ", buf, count);
     //print out each byte of buf as char to see if it was written properly
     for (int i = 0; i < count; i++) {
@@ -237,7 +237,7 @@ void Node::begin_MAP() {
         vector_clock += std::to_string(i) + " ";
     }
     std::string temp = "0 " + vector_clock;
-    int msg_size = sizeof(&temp[0]);
+    int msg_size = temp.size();
     std::this_thread::sleep_for(std::chrono::seconds(10)); //wait for other processes to finish setup
 
     int messages_sent = 0;
@@ -258,7 +258,7 @@ void Node::begin_MAP() {
             for (const auto& pair : this->connections) {
                 std::string msg;
                 msg.reserve(msg_size);
-                if (this->read_nonblocking(pair.second.read_fd, &msg[0], msg_size)) { //if successful read of message
+                if (this->read_nonblocking(pair.second.read_fd, msg, msg_size)) { //if successful read of message
                     std::cout << msg << " this is the message after read returns true\n" << std::flush;
                     std::vector<int> temp_clock = this->extract_clock(msg);
                     for (int i = 0; i < this->clock.size(); i++) {
