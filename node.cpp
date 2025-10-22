@@ -211,7 +211,7 @@ std::vector<int> Node::extract_clock(std::string msg) {
     std::vector<int> clock_vals(tokens.size() - 1);
     std::cout << "message to extract: " << msg << ". is the last char a space: " << msg.back() << " == " << "\" \"" << (msg.back() == ' ') << "\n";
     std::cout << "tokens size: " << tokens.size() << "\ntokens: " << std::flush;
-    for (int i = 1; i < tokens.size(); i++) { //first token is msg_type, not part of vector clock
+    for (int i = 1; i < (this->clock).size(); i++) { //first token is msg_type, not part of vector clock
         std::cout << tokens[i] << ", ";
         //clock_vals[i - 1] = std::stoi(tokens[i]);
     }
