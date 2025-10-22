@@ -237,7 +237,7 @@ void Node::begin_MAP() {
         vector_clock += std::to_string(i) + " ";
     }
     std::string temp = "0 " + vector_clock;
-    int msg_size = sizeof(temp);
+    int msg_size = sizeof(&temp[0]);
     std::this_thread::sleep_for(std::chrono::seconds(10)); //wait for other processes to finish setup
 
     int messages_sent = 0;
