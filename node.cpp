@@ -263,6 +263,11 @@ void Node::begin_MAP() {
                     }
                     (this->clock)[this->node_number]++;
                     std::cout << "Node " << this->node_number << " received message [" << msg << "] from: " << pair.first << "\n" << std::flush;
+                    std::cout << "clock: []";
+                    for (int i = 0; i < (this->clock).size(); i++) {
+                        std::cout << (this->clock)[i] << ", ";
+                    }
+                    std::cout << "]\n" << std::flush;
                     this->become_active();
                     break;
                 }
