@@ -209,10 +209,12 @@ bool Node::read_nonblocking(int fd, std::string& buf, size_t count) {
 std::vector<int> Node::extract_clock(std::string msg) {
     std::vector<std::string> tokens = split(msg, " ");
     std::vector<int> clock_vals(tokens.size() - 1);
-    std::cout << "tokens size: " << tokens.size() << "\n" << std::flush;
+    std::cout << "tokens size: " << tokens.size() << "\ntokens: " << std::flush;
     for (int i = 1; i < tokens.size(); i++) { //first token is msg_type, not part of vector clock
-        clock_vals[i - 1] = std::stoi(tokens[i]);
+        std::cout << tokens[i] << ", ";
+        //clock_vals[i - 1] = std::stoi(tokens[i]);
     }
+    std::cout << "\n" << std::flush;
     
     return clock_vals;
 }
