@@ -201,14 +201,8 @@ bool Node::read_nonblocking(int fd, std::string& buf, size_t count) {
     }
 
     // If we reach here, full message has been read
-    buf = std::string(buffer);
-    printf("true: %s --- count = %d --- ", buf, count);
-    //print out each byte of buf as char to see if it was written properly
-    for (int i = 0; i < count; i++) {
-        std::cout << ((char*)buf)[i];
-    }
-    std::cout << "\n" << std::flush;
-    //std::cout << "true: " << &buf << "\n" << std::flush;
+    buf = std::string(reinterpret_cast<char*>(buffer), count);
+    std::cout << "true: " << buf << ", count: " << count << "\n" << std::flush;
     return true;
 }
 
