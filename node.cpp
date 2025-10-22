@@ -30,7 +30,7 @@ Node::Node(const config& node_info) {
     "hostname: " << hostname << "\n\t" <<
     "port: " << port << "\n}\n";
     if (setup(node_info) > -1) {
-        
+        std::this_thread::sleep_for(std::chrono::seconds(10)); //wait for other processes to finish setup
         begin_MAP();
     }
 }
@@ -166,11 +166,10 @@ void Node::send_message(int node, int msg_type, std::string msg) {
         std::string vector_clock = "";
         (this->clock)[node_number]++;
         for (int i = 0; i < (this->clock).size(); i++) {
-            std::cout << (this->clock)[i] << ", ";
             vector_clock += std::to_string((this->clock)[i]) + " ";
         }
         std::string message = "0 " + vector_clock;
-        std::cout << "message being sent: " << &message[0] << "\n" << std::flush;
+        std::cout << "message being sent: " << &message[0] << "\nvector clock [" << vector_clock << "]\n" << std::flush;
         write(sockfd, &message[0], sizeof(char) * (message.size() + 1));
     }
     else {
@@ -202,7 +201,6 @@ bool Node::read_nonblocking(int fd, std::string& buf, size_t count) {
 
     // If we reach here, full message has been read
     buf = std::string(reinterpret_cast<char*>(buffer), count);
-    std::cout << "true: " << buf << ", count: " << count << "\n" << std::flush;
     return true;
 }
 
@@ -235,7 +233,6 @@ void Node::begin_MAP() {
     }
     std::string temp = "0 " + vector_clock;
     int msg_size = temp.size();
-    std::this_thread::sleep_for(std::chrono::seconds(10)); //wait for other processes to finish setup
 
     int messages_sent = 0;
     while (messages_sent < this->maxNumber) {
@@ -245,7 +242,6 @@ void Node::begin_MAP() {
                 int node_num = temp_connections[nodes(gen)];
                 send_message(node_num, 0, "");
                 messages_sent++;
-                std::cout << "Sent message to: " << node_num << ", from: " << this->node_number << "\n" << std::flush;
                 std::this_thread::sleep_for(std::chrono::milliseconds(this->minSendDelay));
             }
             this->become_passive();
@@ -256,16 +252,15 @@ void Node::begin_MAP() {
                 std::string msg;
                 msg.reserve(msg_size);
                 if (this->read_nonblocking(pair.second.read_fd, msg, msg_size)) { //if successful read of message
-                    std::cout << msg << " this is the message after read returns true\n" << std::flush;
                     std::vector<int> temp_clock = this->extract_clock(msg);
                     for (int i = 0; i < this->clock.size(); i++) {
                         (this->clock)[i] = std::max((this->clock)[i], temp_clock[i]);
                     }
                     (this->clock)[this->node_number]++;
                     std::cout << "Node " << this->node_number << " received message [" << msg << "] from: " << pair.first << "\n" << std::flush;
-                    std::cout << "clock: []";
+                    std::cout << "vector clock: [";
                     for (int i = 0; i < (this->clock).size(); i++) {
-                        std::cout << (this->clock)[i] << ", ";
+                        std::cout << (this->clock)[i] << " ";
                     }
                     std::cout << "]\n" << std::flush;
                     this->become_active();
