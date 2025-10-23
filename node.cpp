@@ -161,8 +161,9 @@ void Node::become_active() { isActive = true; }
 void Node::become_passive() { isActive = false; }
 
 void Node::send_message(int node, int msg_type, std::string msg) {
+    int sockfd = (this->connections).find(node)->second.write_fd;
+
     if (msg_type == 0) { //MAP protocol message. ie, application message
-        int sockfd = (this->connections).find(node)->second.write_fd;
         std::string vector_clock = "";
         (this->clock)[node_number]++;
         for (int i = 0; i < (this->clock).size(); i++) {
@@ -172,8 +173,9 @@ void Node::send_message(int node, int msg_type, std::string msg) {
         std::cout << "message being sent: " << &message[0] << "\nvector clock [" << vector_clock << "]\n" << std::flush;
         write(sockfd, &message[0], sizeof(char) * (message.size() + 1));
     }
-    else {
-        //Chandy-Lamport message. ie, control message
+    else { //Chandy-Lamport message. ie, control/marker message
+        std::string message = "1";
+        write(sockfd, &message[0], sizeof(char) * (message.size()));
     }
 }
 
@@ -235,8 +237,8 @@ void Node::begin_MAP() {
     int msg_size = temp.size();
 
     int messages_sent = 0;
-    while (messages_sent < this->maxNumber) {
-        if ((this->isActive)) {
+    while (!(this->terminateProtocol)) {
+        if (messages_sent < this->maxNumber && (this->isActive)) {
             int num = num_messages(gen);
             for (int i = 0; i < num; i++) {
                 int node_num = temp_connections[nodes(gen)];
@@ -246,12 +248,13 @@ void Node::begin_MAP() {
             }
             this->become_passive();
         }
-        else {
-            //for each connection, check the read_fd to see if application message was received
-            for (const auto& pair : this->connections) {
-                std::string msg;
-                msg.reserve(msg_size);
-                if (this->read_nonblocking(pair.second.read_fd, msg, msg_size)) { //if successful read of message
+
+        //read, handle accordingly based on whether snapshot protocol or MAP protocol
+        for (const auto& pair : this->connections) {
+            std::string msg;
+            msg.reserve(msg_size);
+            if (this->read_nonblocking(pair.second.read_fd, msg, msg_size)) { //if successful read of message
+                if (msg[0] == '0') {
                     std::vector<int> temp_clock = this->extract_clock(msg);
                     for (int i = 0; i < this->clock.size(); i++) {
                         (this->clock)[i] = std::max((this->clock)[i], temp_clock[i]);
@@ -264,12 +267,15 @@ void Node::begin_MAP() {
                     }
                     std::cout << "]\n" << std::flush;
                     this->become_active();
-                    break;
+                }
+                else {
+                    
                 }
             }
         }
+        
+        this->become_passive();
     }
-    this->become_passive();
 }
 
 std::ostream& operator<<(std::ostream& os, const Node& node) {
