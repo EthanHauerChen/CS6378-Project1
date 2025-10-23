@@ -268,8 +268,17 @@ void Node::begin_MAP() {
                     std::cout << "]\n" << std::flush;
                     this->become_active();
                 }
-                else {
-                    
+                else { //CL protocol
+                    if (!(this->isRecording)) {
+                        (this->parent) = pair.first; //parent node, we will send our snapshot and other snapshots to parent
+                        //broadcast marker messages along all channels
+                        for (const auto& p : this->connections) {
+                            send_message(p.first, 1, "1");
+                        }
+                    }
+                    else {
+                        
+                    }
                 }
             }
         }

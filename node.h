@@ -21,6 +21,7 @@ class Node {
     //local state of the node is the vector clock at that time
     std::vector<std::vector<string>> channel_state; //consists of all messages recorded since turning "red/active (not the same as isActive which is part of MAP protocol)"
     bool isRecording = false; //whether the node should be recording channel state or not
+    int parent; //node from which received the first marker message
 
     struct Connection {
         int read_fd;
