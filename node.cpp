@@ -25,6 +25,7 @@ Node::Node(const config& node_info) {
     this->minSendDelay = node_info.minSendDelay;
     this->isActive = true;
     this->clock = std::vector<int>(node_info.nodes, 0); //initialize all 0s
+    this->snapshot = "";
     if (this->node_number == 0) this->isRecording = true;
     std::cout << "Node setup {\n\t" << 
     "Node number: " << node_number << "\n\t" <<
@@ -205,14 +206,23 @@ std::string Node::read_msg(int fd) {
 
 std::vector<int> Node::extract_clock(std::string msg) {
     std::vector<std::string> tokens = split(msg, " ");
-    std::vector<int> clock_vals(tokens.size() - 1);
+    std::vector<int> clock_vals((this->clock).size());
     // std::cout << "message to extract: " << msg << ". is the last char a space: " << msg.back() << " == " << "\" \"" << (msg.back() == ' ') << "\n";
     // std::cout << "tokens size: " << tokens.size() << "\ntokens: " << std::flush;
-    for (int i = 1; i < (this->clock).size() + 1; i++) { //first token is msg_type, not part of vector clock
-        //std::cout << tokens[i] << ", ";
-        clock_vals[i - 1] = std::stoi(tokens[i]);
+    if (tokens[0] == "0") {
+        for (int i = 1; i < (this->clock).size() + 1; i++) { //first token is msg_type, not part of vector clock
+            //std::cout << tokens[i] << ", ";
+            clock_vals[i - 1] = std::stoi(tokens[i]);
+        }
     }
-    //std::cout << "\n" << std::flush;
+    else {
+        std::cout << "extract clock:  ";
+        for (int i = 2; i < (this->clock).size() + 1; i++) {
+            std::cout << tokens[i] << ", ";
+            clock_vals[i - 2] = std::stoi(tokens[i]);
+        }
+    }
+    std::cout << "\n" << std::flush;
     
     return clock_vals;
 }
@@ -225,6 +235,7 @@ void Node::begin_MAP() {
     std::vector<int> temp_connections;
     for (const auto& pair : this->connections) temp_connections.push_back(pair.first); //in order to random access nodes to send messages to, construct vector of node_nums
     auto past = std::chrono::steady_clock::now();
+    if (this->node_number == 0) snapshot[0] = this->clock;
 
     int messages_sent = 0;
     while (!(this->terminateProtocol)) {
@@ -281,12 +292,27 @@ void Node::begin_MAP() {
                         msg = msg.substr(2, msg.size()); //cut off first character cuz that gets added on by send_message
                         send_message(this->parent, 1, msg);
                     }
+                    else if (msg.size() > 1 && this->node_number == 0) {
+                        int nod_num = std::stoi(msg[2]);
+                        (this->snapshot)[nod_num] = this->extract_clock(msg);
+                    }
                 }
             }
         }
         
         this->become_passive();
     }
+}
+
+void Node::print_snapshot() {
+    for (int i = 0; i < (this->snapshot).size(); i++) {
+        std::cout << i << " ";
+        for (int j = 0; j < (this->snapshot)[i].size(); j++) {
+            std::cout << (this->snapshot)[i][j] << " ";
+        }
+        std::cout << endl;
+    }
+    std::cout << std::flush;
 }
 
 std::ostream& operator<<(std::ostream& os, const Node& node) {

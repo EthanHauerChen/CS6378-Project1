@@ -22,6 +22,7 @@ class Node {
     //std::vector<std::vector<string>> channel_state; //consists of all messages recorded since turning "red/active (not the same as isActive which is part of MAP protocol)"
     bool isRecording = false; //whether the node should be recording channel state or not
     int parent; //node from which received the first marker message
+    std::vector<std::vector<int>> snapshot;
 
     struct Connection {
         int read_fd;
@@ -43,6 +44,7 @@ public:
     void become_active();
     void become_passive();
     void send_message(const std::string&);
+    void print_snapshot();
     friend std::ostream& operator<<(std::ostream& os, const Node& node);
 };
 
