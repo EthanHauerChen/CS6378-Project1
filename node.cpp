@@ -230,6 +230,7 @@ void Node::begin_MAP() {
     while (!(this->terminateProtocol)) {
         auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - past);
         if (elapsed.count() > 17) return; //if doing nothing for long time, stop executing program
+        past = std::chrono::steady_clock::now();
         if (messages_sent < this->maxNumber && (this->isActive)) {
             int num = num_messages(gen);
             for (int i = 0; i < num; i++) {
