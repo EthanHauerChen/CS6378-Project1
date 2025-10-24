@@ -25,6 +25,7 @@ Node::Node(const config& node_info) {
     this->minSendDelay = node_info.minSendDelay;
     this->isActive = true;
     this->clock = std::vector<int>(node_info.nodes, 0); //initialize all 0s
+    if (this->node_number == 0) this->isRecording = true;
     std::cout << "Node setup {\n\t" << 
     "Node number: " << node_number << "\n\t" <<
     "hostname: " << hostname << "\n\t" <<
@@ -73,10 +74,6 @@ int Node::listen_for_connections(int num_neighbors) {
             int node;
             read(connection_fd, &node, sizeof(int));
             std::cout << "Server " << node_number << " connected with Client " << node << "\n";
-
-            /* change read_fd to be nonblocking */
-            int flags = fcntl(connection_fd, F_GETFL, 0);
-            fcntl(connection_fd, F_SETFL, flags | O_NONBLOCK);
 
             /* place associated socket fd into connections hash table */
             if (connections.find(node) == connections.end()) { //same as connections.contains(node), but contains only available for c++20 
@@ -171,39 +168,35 @@ void Node::send_message(int node, int msg_type, std::string msg) {
         }
         std::string message = "0 " + vector_clock;
         std::cout << "message being sent: " << &message[0] << "\nvector clock [" << vector_clock << "]\n" << std::flush;
-        write(sockfd, &message[0], sizeof(char) * (message.size() + 1));
+        int len = message.size();
+        int len_net = htonl(len);
+        write(sockfd, &len_net, sizeof(len_net));
+        write(sockfd, &message[0], message.size());
     }
     else { //Chandy-Lamport message. ie, control/marker message
-        std::string message = "1";
+        std::string message = "1" + msg;
+        std::cout << "message being sent: " << &message[0] << "\nvector clock [" << vector_clock << "]\n" << std::flush;
+        int len = message.size();
+        int len_net = htonl(len);
+        write(sockfd, &len_net, sizeof(len_net));
         write(sockfd, &message[0], sizeof(char) * (message.size()));
     }
 }
 
-bool Node::read_nonblocking(int fd, std::string& buf, size_t count) {
-    int bytes_read = 0;
-    unsigned char buffer[count];
+std::string Node::read_msg(int fd) {
+    int len = -1;
+    read(fd, &len, sizeof(int));
 
-    while (bytes_read < (int)count) {
-        int n = read(fd, buffer + bytes_read, count - bytes_read);
-
-        if (n > 0) {
-            bytes_read += n;
-        } 
-        else {
-            // n < 0, Error or no data
-            if (errno == EAGAIN || errno == EWOULDBLOCK) {
-                return false; // No data right now, just return and try again later
-            } 
-            else {
-                std::cerr << "Read error: " << strerror(errno) << "\n";
-                return false;
-            }
+    std::string message(len, '\0');
+    if (len > 0) {
+        int n = read(fd, &message[0], len);
+        if (n < 0) {
+            perror("read failed");
+            return "";
         }
     }
 
-    // If we reach here, full message has been read
-    buf = std::string(reinterpret_cast<char*>(buffer), count);
-    return true;
+    return message;
 }
 
 std::vector<int> Node::extract_clock(std::string msg) {
@@ -228,14 +221,6 @@ void Node::begin_MAP() {
     std::vector<int> temp_connections;
     for (const auto& pair : this->connections) temp_connections.push_back(pair.first); //in order to random access nodes to send messages to, construct vector of node_nums
 
-    //determine size of messages sent/received
-    std::string vector_clock = "";
-    for (int i : this->clock) {
-        vector_clock += std::to_string(i) + " ";
-    }
-    std::string temp = "0 " + vector_clock;
-    int msg_size = temp.size();
-
     int messages_sent = 0;
     while (!(this->terminateProtocol)) {
         if (messages_sent < this->maxNumber && (this->isActive)) {
@@ -251,9 +236,8 @@ void Node::begin_MAP() {
 
         //read, handle accordingly based on whether snapshot protocol or MAP protocol
         for (const auto& pair : this->connections) {
-            std::string msg;
-            msg.reserve(msg_size);
-            if (this->read_nonblocking(pair.second.read_fd, msg, msg_size)) { //if successful read of message
+            std::string msg = this->read_msg(pair.second.read_fd);
+            if (msg.size() > 0) { //if successful read of message
                 if (msg[0] == '0') {
                     std::vector<int> temp_clock = this->extract_clock(msg);
                     for (int i = 0; i < this->clock.size(); i++) {
@@ -270,17 +254,24 @@ void Node::begin_MAP() {
                 }
                 else { //CL protocol
                     if (!(this->isRecording)) {
-                        (this->parent) = pair.first; //parent node, we will send our snapshot and other snapshots to parent
+                        this->isRecording = true;
+                        this->parent = pair.first; //parent node, we will send our snapshot and other snapshots to parent
+                        std::string message = std::to_string(this->node_number) + " ";
 
                         //broadcast marker messages along all channels
                         for (const auto& p : this->connections) {
-                            send_message(p.first, 1, "1");
+                            send_message(p.first, 1, "");
                         }
 
                         //send snapshot to parent
+                        for (int i = 0; i < (this->clock).size(); i++) {
+                            message += std::to_string((this->clock)[i]) + " ";
+                        }
+                        send_message(this->parent, 1, message);
                     }
-                    else {
-
+                    else if (msg.size() > 1 && this->node_number != 0) { //msg contains vector clock, ie snapshot
+                        msg = msg.substr(2, msg.size()); //cut off first character cuz that gets added on by send_message
+                        send_message(this->parent, 1, msg);
                     }
                 }
             }

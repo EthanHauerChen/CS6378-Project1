@@ -31,8 +31,8 @@ class Node {
     int listen_for_connections(int);
     int initiate_connections(int[], std::string[], int[], int);
     int setup(const config& node_info);
-    void send_message(int node, int msg_type, std::string msg);
-    bool read_nonblocking(int fd, std::string& buf, size_t count);
+    void send_message(int node, int msg_type, std::string msg)
+    std::string read_msg(int fd);
     std::vector<int> extract_clock(std::string); //gets the clock values from a message
     void begin_MAP();
     void take_snapshot();
