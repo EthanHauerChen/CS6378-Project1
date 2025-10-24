@@ -1,11 +1,11 @@
 # s i x g l o b a l p a r ame te r s ( s e e above )
 5 6 10 100 2000 15
 
-0 dc02 8084 # nodeID hostName l i s t e n P o r t
-1 dc03 8083
-2 dc04 8083
-3 dc05 8082
-4 dc06 8083
+0 dc02 8764 # nodeID hostName l i s t e n P o r t
+1 dc03 8763
+2 dc04 8763
+3 dc05 8762
+4 dc06 8763
 
 1 4 # sp ac e d elimi t e d l i s t o f n ei g h b o r s f o r node 0
 0 2 3 # sp ac e d elimi t e d l i s t o f n ei g h b o r s f o r node 1
