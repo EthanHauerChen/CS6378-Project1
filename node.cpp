@@ -25,8 +25,10 @@ Node::Node(const config& node_info) {
     this->minSendDelay = node_info.minSendDelay;
     this->isActive = true;
     this->clock = std::vector<int>(node_info.nodes, 0); //initialize all 0s
-    this->snapshot = "";
-    if (this->node_number == 0) this->isRecording = true;
+    if (this->node_number == 0) {
+        this->isRecording = true;
+        snapshot = std::vector<std::vector<int>>(connections.size(), std::vector<int>(clock.size(), 0));
+    }
     std::cout << "Node setup {\n\t" << 
     "Node number: " << node_number << "\n\t" <<
     "hostname: " << hostname << "\n\t" <<
