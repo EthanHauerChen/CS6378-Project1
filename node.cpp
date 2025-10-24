@@ -167,7 +167,7 @@ void Node::send_message(int node, int msg_type, std::string msg) {
             vector_clock += std::to_string((this->clock)[i]) + " ";
         }
         std::string message = "0 " + vector_clock;
-        std::cout << "message being sent: " << &message[0] << "\nvector clock [" << vector_clock << "]\n" << std::flush;
+        std::cout << "message size: " << message.size() << ", message being sent: " << &message[0] << "\nvector clock [" << vector_clock << "]\n" << std::flush;
         int len = message.size();
         int len_net = htonl(len);
         write(sockfd, &len_net, sizeof(len_net));
