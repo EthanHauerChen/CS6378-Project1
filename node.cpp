@@ -184,11 +184,12 @@ void Node::send_message(int node, int msg_type, std::string msg) {
 }
 
 std::string Node::read_msg(int fd) {
-    int len = -1;
+    int len = 0;
     read(fd, &len, sizeof(int));
 
     
     if (len > 0) {
+        std::cout << "len is " << len << "\n" << std::flush;
         std::string message(len, '\0');
         int n = read(fd, &message[0], len);
         if (n < 0) {
