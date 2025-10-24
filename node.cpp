@@ -186,6 +186,7 @@ void Node::send_message(int node, int msg_type, std::string msg) {
 std::string Node::read_msg(int fd) {
     int len = 0;
     read(fd, &len, sizeof(int));
+    len = ntohl(len);
     std::cout << "len is " << len << "\n" << std::flush;
 
     
