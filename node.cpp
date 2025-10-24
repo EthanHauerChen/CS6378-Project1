@@ -293,3 +293,10 @@ std::ostream& operator<<(std::ostream& os, const Node& node) {
     os << "Node(hostname=" << node.hostname << ", port=" << node.port << ")\n";
     return os;
 }
+
+Node::~Node() {
+    for (const auto& pair : this->connections) {
+        close(pair.first);
+        close(pair.second);
+    }
+}
