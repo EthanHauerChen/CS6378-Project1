@@ -187,16 +187,18 @@ std::string Node::read_msg(int fd) {
     int len = -1;
     read(fd, &len, sizeof(int));
 
-    std::string message(len, '\0');
+    
     if (len > 0) {
+        std::string message(len, '\0');
         int n = read(fd, &message[0], len);
         if (n < 0) {
             perror("read failed");
             return "";
         }
+        return message;
     }
 
-    return message;
+    return "";
 }
 
 std::vector<int> Node::extract_clock(std::string msg) {
