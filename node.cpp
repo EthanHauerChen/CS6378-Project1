@@ -295,7 +295,7 @@ void Node::begin_MAP() {
                         send_message(this->parent, 1, msg);
                     }
                     else if (msg.size() > 1 && this->node_number == 0) {
-                        int nod_num = std::stoi(msg[2]);
+                        int nod_num = msg[2] - '0';
                         (this->snapshot)[nod_num] = this->extract_clock(msg);
                     }
                 }
@@ -312,7 +312,7 @@ void Node::print_snapshot() {
         for (int j = 0; j < (this->snapshot)[i].size(); j++) {
             std::cout << (this->snapshot)[i][j] << " ";
         }
-        std::cout << endl;
+        std::cout << std::endl;
     }
     std::cout << std::flush;
 }
