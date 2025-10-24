@@ -245,6 +245,7 @@ void Node::begin_MAP() {
         //read, handle accordingly based on whether snapshot protocol or MAP protocol
         for (const auto& pair : this->connections) {
             std::string msg = this->read_msg(pair.second.read_fd);
+            if (msg.size() == 0) std::cout << "size is 0\n" << std::flush;
             if (msg.size() > 0) { //if successful read of message
                 if (msg[0] == '0') {
                     std::vector<int> temp_clock = this->extract_clock(msg);
