@@ -296,7 +296,7 @@ std::ostream& operator<<(std::ostream& os, const Node& node) {
 
 Node::~Node() {
     for (const auto& pair : this->connections) {
-        close(pair.first);
-        close(pair.second);
+        close(pair.second.read_fd);
+        close(pair.second.write_fd);
     }
 }
