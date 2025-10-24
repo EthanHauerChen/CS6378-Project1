@@ -19,7 +19,7 @@ class Node {
 
     /* for implementing Chandy-Lamport global snapshot protocol */
     //local state of the node is the vector clock at that time
-    std::vector<std::vector<string>> channel_state; //consists of all messages recorded since turning "red/active (not the same as isActive which is part of MAP protocol)"
+    //std::vector<std::vector<string>> channel_state; //consists of all messages recorded since turning "red/active (not the same as isActive which is part of MAP protocol)"
     bool isRecording = false; //whether the node should be recording channel state or not
     int parent; //node from which received the first marker message
 
@@ -31,7 +31,7 @@ class Node {
     int listen_for_connections(int);
     int initiate_connections(int[], std::string[], int[], int);
     int setup(const config& node_info);
-    void send_message(int node, int msg_type, std::string msg)
+    void send_message(int node, int msg_type, std::string msg);
     std::string read_msg(int fd);
     std::vector<int> extract_clock(std::string); //gets the clock values from a message
     void begin_MAP();

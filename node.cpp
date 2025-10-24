@@ -175,7 +175,7 @@ void Node::send_message(int node, int msg_type, std::string msg) {
     }
     else { //Chandy-Lamport message. ie, control/marker message
         std::string message = "1" + msg;
-        std::cout << "message being sent: " << &message[0] << "\nvector clock [" << vector_clock << "]\n" << std::flush;
+        std::cout << "message being sent: " << &message[0] << "\n" << std::flush;
         int len = message.size();
         int len_net = htonl(len);
         write(sockfd, &len_net, sizeof(len_net));
