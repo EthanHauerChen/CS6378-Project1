@@ -39,6 +39,7 @@ class Node {
 
 public:
     Node(const config&);
+    ~Node();
     void become_active();
     void become_passive();
     void send_message(const std::string&);
