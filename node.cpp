@@ -307,7 +307,7 @@ void Node::begin_MAP() {
 }
 
 void Node::print_snapshot() {
-    std::cout << "Printing snapshot-------------------------------------\n";
+    std::cout << "Printing snapshot-------------------------------------\n" << std::flush;
     for (int i = 0; i < (this->snapshot).size(); i++) {
         std::cout << i << " ";
         for (int j = 0; j < (this->snapshot)[i].size(); j++) {
