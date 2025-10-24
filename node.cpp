@@ -246,7 +246,7 @@ void Node::begin_MAP() {
                         (this->clock)[i] = std::max((this->clock)[i], temp_clock[i]);
                     }
                     (this->clock)[this->node_number]++;
-                    std::cout << "Node " << this->node_number << " received message [" << msg << "] from: " << pair.first << "\n" << std::flush;
+                    std::cout << "messaeg size: " << msg.size() << ". Node " << this->node_number << " received message [" << msg << "] from: " << pair.first << "\n" << std::flush;
                     std::cout << "vector clock: [";
                     for (int i = 0; i < (this->clock).size(); i++) {
                         std::cout << (this->clock)[i] << " ";
