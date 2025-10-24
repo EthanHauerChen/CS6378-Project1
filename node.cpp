@@ -223,9 +223,12 @@ void Node::begin_MAP() {
     std::uniform_int_distribution<> nodes(0, (this->connections).size() - 1);
     std::vector<int> temp_connections;
     for (const auto& pair : this->connections) temp_connections.push_back(pair.first); //in order to random access nodes to send messages to, construct vector of node_nums
+    auto past = std::chrono::steady_clock::now();
 
     int messages_sent = 0;
     while (!(this->terminateProtocol)) {
+        auto elapsed = duration_cast<seconds>(std::chrono::steady_clock::now() - past);
+        if (elapsed.count() > 17) return; //if doing nothing for long time, stop executing program
         if (messages_sent < this->maxNumber && (this->isActive)) {
             int num = num_messages(gen);
             for (int i = 0; i < num; i++) {
