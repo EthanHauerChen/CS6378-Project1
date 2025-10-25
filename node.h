@@ -16,6 +16,7 @@ class Node {
     bool isActive;
     bool terminateProtocol = false;
     std::vector<int> clock;
+    bool destroy = false; //flag set to true when node should be destroyed. node will wait an amount of time before destroying so that it may pass along other destruction messages before possibly disconnecting the graph
 
     /* for implementing Chandy-Lamport global snapshot protocol */
     //local state of the node is the vector clock at that time

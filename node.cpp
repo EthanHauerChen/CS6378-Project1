@@ -176,13 +176,21 @@ void Node::send_message(int node, int msg_type, std::string msg) {
         write(sockfd, &len_net, sizeof(len_net));
         write(sockfd, &message[0], message.size());
     }
-    else { //Chandy-Lamport message. ie, control/marker message
+    else if (msg_type == 1) { //Chandy-Lamport message. ie, control/marker message
         std::string message = "1" + msg;
         std::cout << "message being sent: " << &message[0] << "\n" << std::flush;
         int len = message.size();
         int len_net = htonl(len);
         write(sockfd, &len_net, sizeof(len_net));
         write(sockfd, &message[0], sizeof(char) * (message.size()));
+    }
+    else { //termination message
+        int len = 1;
+        int msg = 2;
+        int len_net = htonl(len);
+        int msg_net = htonl(msg);
+        write(sockfd, &len_net, sizeof(int));
+        write(sockfd, &msg_net, sizeof(int));
     }
 }
 
@@ -199,6 +207,13 @@ std::string Node::read_msg(int fd) {
         if (n < 0) {
             perror("read failed");
             return "";
+        }
+        if (n == 1 && message[0] == '2') { //if termination message
+            for (const auto& p : this->connections) {
+                send_message(p.first, 2, "");
+            }
+            this->destroy = true;
+            return message;
         }
         return message;
     }
@@ -273,7 +288,7 @@ void Node::begin_MAP() {
                     std::cout << "]\n" << std::flush;
                     this->become_active();
                 }
-                else { //CL protocol
+                else if (msg[0] == '1') { //CL protocol
                     if (!(this->isRecording)) {
                         this->isRecording = true;
                         this->parent = pair.first; //parent node, we will send our snapshot and other snapshots to parent
@@ -298,6 +313,9 @@ void Node::begin_MAP() {
                         int nod_num = msg[2] - '0';
                         (this->snapshot)[nod_num] = this->extract_clock(msg);
                     }
+                }
+                else { //connection closed (read returned 0) or received termination message
+
                 }
             }
         }
