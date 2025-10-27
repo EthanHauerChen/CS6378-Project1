@@ -209,6 +209,7 @@ std::string Node::read_msg(int fd) {
             return "";
         }
         if (n == 1 && message[0] == '2') { //if termination message
+            std::cout << "connection closed, terminating program\n" << std::flush;
             for (const auto& p : this->connections) {
                 send_message(p.first, 2, "");
             }
@@ -255,7 +256,7 @@ void Node::begin_MAP() {
     if (this->node_number == 0) snapshot[0] = this->clock;
 
     int messages_sent = 0;
-    while (!(this->terminateProtocol)) {
+    while (!(this->terminateProtocol) && !(this->destroy)) {
         auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - past);
         if (elapsed.count() > 17) return; //if doing nothing for long time, stop executing program
         if (messages_sent < this->maxNumber && (this->isActive)) {
@@ -313,9 +314,6 @@ void Node::begin_MAP() {
                         int nod_num = msg[2] - '0';
                         (this->snapshot)[nod_num] = this->extract_clock(msg);
                     }
-                }
-                else { //connection closed (read returned 0) or received termination message
-
                 }
             }
         }
