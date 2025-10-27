@@ -198,28 +198,35 @@ std::string Node::read_msg(int fd) {
     int len = 0;
     read(fd, &len, sizeof(int));
     len = ntohl(len);
+    size_t total_read = 0;
+    char buffer[len];
     std::cout << "len is " << len << "\n" << std::flush;
 
-    
-    if (len > 0) { 
-        std::string message(len, '\0');
-        int n = read(fd, &message[0], len);
-        if (n < 0) {
-            perror("read failed");
-            return "";
+    while (total_read < len) {
+        ssize_t n = read(fd, buffer + total_read, len - total_read);
+        if (n == 0) {
+            //connection closed
+            break;
+        } else if (n < 0) {
+            if (errno == EINTR)
+                continue; //interrupted, try again
+            else
+                return ""; //error
         }
-        if (n == 1 && message[0] == '2') { //if termination message
-            std::cout << "connection closed, terminating program\n" << std::flush;
-            for (const auto& p : this->connections) {
-                send_message(p.first, 2, "");
-            }
-            this->destroy = true;
-            return message;
+        total_read += n;
+    }
+    std::string message(buffer, len);
+
+    if (len == 1 && message[0] == '2') { //if termination message
+        std::cout << "connection closed, terminating program\n" << std::flush;
+        for (const auto& p : this->connections) {
+            send_message(p.first, 2, "");
         }
+        this->destroy = true;
         return message;
     }
 
-    return "";
+    return message;
 }
 
 std::vector<int> Node::extract_clock(std::string msg) {
