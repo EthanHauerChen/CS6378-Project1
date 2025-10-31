@@ -40,12 +40,14 @@ Node::Node(const config& node_info) {
             bool stop = false;
             while (!stop) {
                 for (const auto& pair : this->connections) {
-                    if (read_msg(pair.second.read_fd)[0] == "3") {
+                    std::string msg = read_msg(pair.second.read_fd);
+                    if (msg.emtpy()) return;
+                    if (msg[0] == '3') {
                         stop = true;
                         break;
                     }
                 }
-                if (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - past) > 10) return;
+                if (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - past).count() > 10) return;
             }
         }
         begin_MAP();
