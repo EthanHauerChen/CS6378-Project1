@@ -196,11 +196,23 @@ void Node::send_message(int node, int msg_type, std::string msg) {
 
 std::string Node::read_msg(int fd) {
     int len = 0;
-    read(fd, &len, sizeof(int));
+    int returnval = read(fd, &len, sizeof(int));
     len = ntohl(len);
     size_t total_read = 0;
     char buffer[len];
     std::cout << "len is " << len << "\n" << std::flush;
+    if (returnval == 0) { //socket connection closed, abort
+        int nodenum = -1; 
+        for (const auto& p : this->connections) { //obtain nodenum
+            if (p.second.read_fd == fd) {
+                nodenum = p.first;
+                break;
+            }
+        }
+        std::cerr << "socket connection with " << nodenum << " closed. aborting\n";
+        this->destroy = true;
+        return "";
+    }
 
     while (total_read < len) {
         ssize_t n = read(fd, buffer + total_read, len - total_read);
@@ -263,7 +275,7 @@ void Node::begin_MAP() {
     if (this->node_number == 0) snapshot[0] = this->clock;
 
     int messages_sent = 0;
-    while (!(this->terminateProtocol) && !(this->destroy)) {
+    while (!(this->terminateProtocol) || !(this->destroy)) {
         auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - past);
         if (elapsed.count() > 17) return; //if doing nothing for long time, stop executing program
         if (messages_sent < this->maxNumber && (this->isActive)) {
