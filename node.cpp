@@ -186,13 +186,22 @@ void Node::send_message(int node, int msg_type, std::string msg) {
         std::cout << "CL message. Node " << this->node_number << " wrote ||||||len=||||||" << len << " to Node " << node << " connection\n" << std::flush;
         write(sockfd, &message[0], sizeof(char) * (message.size()));
     }
-    else { //termination message
+    else if (msg_type == 2) { //termination message
         int len = 1;
         int msg = 2;
         int len_net = htonl(len);
         int msg_net = htonl(msg);
         write(sockfd, &len_net, sizeof(int));
         std::cout << "Termination message. Node " << this->node_number << " wrote ||||||len=||||||" << len << " to Node " << node << " connection\n" << std::flush;
+        write(sockfd, &msg_net, sizeof(int));
+    }
+    else if (msg_type == 3) { //start message
+        int len = 1;
+        int msg = 3;
+        int len_net = htonl(len);
+        int msg_net = htonl(msg);
+        write(sockfd, &len_net, sizeof(int));
+        std::cout << "start message. Node " << this->node_number << " wrote ||||||len=||||||" << len << " to Node " << node << " connection\n" << std::flush;
         write(sockfd, &msg_net, sizeof(int));
     }
 }
@@ -285,6 +294,13 @@ void Node::begin_MAP() {
     for (const auto& pair : this->connections) temp_connections.push_back(pair.first); //in order to random access nodes to send messages to, construct vector of node_nums
     auto past = std::chrono::steady_clock::now();
     if (this->node_number == 0) snapshot[0] = this->clock;
+
+    //wait for start message to begin, otherwise if it takes too long, terminate
+    while (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - past) < 10) {
+        for (const auto& pair : this->connections) {
+            if (read_msg(pair.second.read_fd) == "3") break;
+        }
+    }
 
     int messages_sent = 0;
     while (!(this->terminateProtocol) && !(this->destroy)) {
