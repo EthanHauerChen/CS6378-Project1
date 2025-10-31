@@ -41,7 +41,7 @@ Node::Node(const config& node_info) {
             while (!stop) {
                 for (const auto& pair : this->connections) {
                     std::string msg = read_msg(pair.second.read_fd);
-                    if (msg.emtpy()) return;
+                    if (msg.empty()) return;
                     if (msg[0] == '3') {
                         stop = true;
                         break;
