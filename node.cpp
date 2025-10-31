@@ -34,7 +34,20 @@ Node::Node(const config& node_info) {
     "hostname: " << hostname << "\n\t" <<
     "port: " << port << "\n}\n";
     if (setup(node_info) > -1) {
-        std::this_thread::sleep_for(std::chrono::seconds(10)); //wait for other processes to finish setup
+        if (this->node_number != 0) {
+            //wait for start message to begin, otherwise if it takes too long, terminate
+            auto past = std::chrono::steady_clock::now();
+            bool stop = false;
+            while (!stop) {
+                for (const auto& pair : this->connections) {
+                    if (read_msg(pair.second.read_fd)[0] == "3") {
+                        stop = true;
+                        break;
+                    }
+                }
+                if (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - past) > 10) return;
+            }
+        }
         begin_MAP();
     }
 }
@@ -286,6 +299,11 @@ std::vector<int> Node::extract_clock(std::string msg) {
 }
 
 void Node::begin_MAP() {
+    //broadcast begin message
+    for (const auto& pair : this->connections) {
+        send_message(pair.first, 3, "");
+    }
+    
     std::random_device rd;  // a seed source for the random number engine
     std::mt19937 gen(rd()); // mersenne_twister_engine seeded with rd()
     std::uniform_int_distribution<> num_messages(this->minPerActive, this->maxPerActive);
@@ -294,17 +312,6 @@ void Node::begin_MAP() {
     for (const auto& pair : this->connections) temp_connections.push_back(pair.first); //in order to random access nodes to send messages to, construct vector of node_nums
     auto past = std::chrono::steady_clock::now();
     if (this->node_number == 0) snapshot[0] = this->clock;
-
-    //wait for start message to begin, otherwise if it takes too long, terminate
-    bool stop = false;
-    while (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - past) < 10 || !stop) {
-        for (const auto& pair : this->connections) {
-            if (read_msg(pair.second.read_fd) == "3") {
-                stop = true;
-                break;
-            }
-        }
-    }
 
     int messages_sent = 0;
     while (!(this->terminateProtocol) && !(this->destroy)) {
