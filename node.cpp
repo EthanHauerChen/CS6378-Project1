@@ -296,9 +296,13 @@ void Node::begin_MAP() {
     if (this->node_number == 0) snapshot[0] = this->clock;
 
     //wait for start message to begin, otherwise if it takes too long, terminate
-    while (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - past) < 10) {
+    bool stop = false;
+    while (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - past) < 10 || !stop) {
         for (const auto& pair : this->connections) {
-            if (read_msg(pair.second.read_fd) == "3") break;
+            if (read_msg(pair.second.read_fd) == "3") {
+                stop = true;
+                break;
+            }
         }
     }
 
