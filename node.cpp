@@ -203,7 +203,7 @@ std::string Node::read_msg(int fd) {
     len = ntohl(len);
     size_t total_read = 0;
     char buffer[len];
-    std::cout << "len is " << len << "\n" << std::flush;
+    //std::cout << "len is " << len << "\n" << std::flush;
     if (returnval == 0) { //socket connection closed, abort
         int nodenum = -1; 
         for (const auto& p : this->connections) { //obtain nodenum
@@ -295,7 +295,7 @@ void Node::begin_MAP() {
         //read, handle accordingly based on whether snapshot protocol or MAP protocol
         for (const auto& pair : this->connections) {
             std::string msg = this->read_msg(pair.second.read_fd);
-            if (msg.size() == 0) std::cout << "size is 0\n" << std::flush;
+            //if (msg.size() == 0) std::cout << "size is 0\n" << std::flush;
             if (msg.size() > 0) { //if successful read of message
                 if (msg[0] == '0') {
                     std::vector<int> temp_clock = this->extract_clock(msg);
