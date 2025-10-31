@@ -174,7 +174,7 @@ void Node::send_message(int node, int msg_type, std::string msg) {
         int len = message.size();
         int len_net = htonl(len);
         write(sockfd, &len_net, sizeof(len_net));
-        std::cout << "MAP message. Node " << this->node_number << "wrote len=" << len << " to Node " << node << " connection\n" << std::flush;
+        std::cout << "MAP message. Node " << this->node_number << " wrote len=" << len << " to Node " << node << " connection\n" << std::flush;
         write(sockfd, &message[0], message.size());
     }
     else if (msg_type == 1) { //Chandy-Lamport message. ie, control/marker message
@@ -183,7 +183,7 @@ void Node::send_message(int node, int msg_type, std::string msg) {
         int len = message.size();
         int len_net = htonl(len);
         write(sockfd, &len_net, sizeof(len_net));
-        std::cout << "CL message. Node " << this->node_number << "wrote len=" << len << " to Node " << node << " connection\n" << std::flush;
+        std::cout << "CL message. Node " << this->node_number << " wrote len=" << len << " to Node " << node << " connection\n" << std::flush;
         write(sockfd, &message[0], sizeof(char) * (message.size()));
     }
     else { //termination message
@@ -192,7 +192,7 @@ void Node::send_message(int node, int msg_type, std::string msg) {
         int len_net = htonl(len);
         int msg_net = htonl(msg);
         write(sockfd, &len_net, sizeof(int));
-        std::cout << "Termination message. Node " << this->node_number << "wrote len=" << len << " to Node " << node << " connection\n" << std::flush;
+        std::cout << "Termination message. Node " << this->node_number << " wrote len=" << len << " to Node " << node << " connection\n" << std::flush;
         write(sockfd, &msg_net, sizeof(int));
     }
 }
