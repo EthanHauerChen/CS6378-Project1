@@ -216,6 +216,11 @@ std::string Node::read_msg(int fd) {
         this->destroy = true;
         return "";
     }
+    else if (returnval < 0) {
+        std::cerr << "read failure. aborting\n";
+        this->destroy = true;
+        return "";
+    }
 
     while (total_read < len) {
         ssize_t n = read(fd, buffer + total_read, len - total_read);
