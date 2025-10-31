@@ -207,6 +207,7 @@ std::string Node::read_msg(int fd) {
     if (returnval == 0) { //socket connection closed, abort
         int nodenum = -1; 
         for (const auto& p : this->connections) { //obtain nodenum
+            send_message(p.first, 2, ""); //send termination messages to neighbors
             if (p.second.read_fd == fd) {
                 nodenum = p.first;
                 break;
@@ -217,6 +218,9 @@ std::string Node::read_msg(int fd) {
         return "";
     }
     else if (returnval < 0) {
+        for (const auto& p : this->connections) {
+            send_message(p.first, 2, "");
+        }
         std::cerr << "read failure. aborting\n";
         this->destroy = true;
         return "";
