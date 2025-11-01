@@ -13,6 +13,7 @@
 #include <fcntl.h>
 #include <algorithm>
 #include <cstdio>
+#include <unordered_set>
 
 
 Node::Node(const config& node_info) {
@@ -34,21 +35,9 @@ Node::Node(const config& node_info) {
     "hostname: " << hostname << "\n\t" <<
     "port: " << port << "\n}\n";
     if (setup(node_info) > -1) {
-        if (this->node_number != 0) {
-            //wait for start message to begin, otherwise if it takes too long, terminate
-            auto past = std::chrono::steady_clock::now();
-            bool stop = false;
-            while (!stop) {
-                for (const auto& pair : this->connections) {
-                    std::string msg = read_msg(pair.second.read_fd);
-                    if (msg.empty()) return;
-                    if (msg[0] == '3') {
-                        stop = true;
-                        break;
-                    }
-                }
-                if (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - past).count() > 10) return;
-            }
+        //broadcast begin message
+        for (const auto& pair : this->connections) {
+            send_message(pair.first, 3, "");
         }
         begin_MAP();
     }
@@ -300,12 +289,7 @@ std::vector<int> Node::extract_clock(std::string msg) {
     return clock_vals;
 }
 
-void Node::begin_MAP() {
-    //broadcast begin message
-    for (const auto& pair : this->connections) {
-        send_message(pair.first, 3, "");
-    }
-    
+void Node::begin_MAP() {    
     std::random_device rd;  // a seed source for the random number engine
     std::mt19937 gen(rd()); // mersenne_twister_engine seeded with rd()
     std::uniform_int_distribution<> num_messages(this->minPerActive, this->maxPerActive);
@@ -314,6 +298,23 @@ void Node::begin_MAP() {
     for (const auto& pair : this->connections) temp_connections.push_back(pair.first); //in order to random access nodes to send messages to, construct vector of node_nums
     auto past = std::chrono::steady_clock::now();
     if (this->node_number == 0) snapshot[0] = this->clock;
+
+    //wait for start message response to begin
+    int num_started = 0;
+    std::unordered_set<int> heard_back; //nodes that we have heard back from
+    while (heard_back.size() < (this->connections).size()) {
+        for (const auto& pair : this->connections) {
+            std::string msg = read_msg(pair.second.read_fd);
+            if (msg.empty()) continue;
+            else if (msg[0] == '3') {
+                heard_back.emplace(pair.first);
+            }
+        }
+        if (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - past).count() > 10) {
+            std::cerr << "failure to hear back from all neighbors, abort\n";
+            return; 
+        }
+    }
 
     int messages_sent = 0;
     while (!(this->terminateProtocol) && !(this->destroy)) {
