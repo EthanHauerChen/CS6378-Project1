@@ -251,12 +251,13 @@ std::string Node::read_msg(int fd) {
         return "";
     }
     else if (returnval < 0) {
-        for (const auto& p : this->connections) {
+        for (const auto& p : this->connections) { //send termination messages to neighbors
             send_message(p.first, 2, "");
         }
         //std::cerr << "read failure. aborting\n";
         debug_msg(get_node_num(fd), false, "read failure. aborting");
         this->destroy = true;
+        std::cout << "this in read_msg " << this << "\n" << std::flush; 
         return "";
     }
 
@@ -342,6 +343,7 @@ void Node::begin_MAP() {
 
     int messages_sent = 0;
     while (!(this->terminateProtocol) && !(this->destroy)) {
+        std::cout << "this in loop " << this << "\n" << std::flush; 
         auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - past);
         if (elapsed.count() > 17) return; //if doing nothing for long time, stop executing program
         if (messages_sent < this->maxNumber && (this->isActive)) {
