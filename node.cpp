@@ -15,6 +15,9 @@
 #include <cstdio>
 #include <unordered_set>
 
+void Node::debug_msg(int other, std::string msg) {
+    std::cout << "{At node " << this->node_number << " | to/from node"
+}
 
 Node::Node(const config& node_info) {
     this->node_number = node_info.node_num;
@@ -315,6 +318,7 @@ void Node::begin_MAP() {
             return; 
         }
     }
+    past = std::chrono::steady_clock::now();
 
     int messages_sent = 0;
     while (!(this->terminateProtocol) && !(this->destroy)) {
@@ -334,7 +338,6 @@ void Node::begin_MAP() {
         //read, handle accordingly based on whether snapshot protocol or MAP protocol
         for (const auto& pair : this->connections) {
             std::string msg = this->read_msg(pair.second.read_fd);
-            //if (msg.size() == 0) std::cout << "size is 0\n" << std::flush;
             if (msg.size() > 0) { //if successful read of message
                 if (msg[0] == '0') {
                     std::vector<int> temp_clock = this->extract_clock(msg);
