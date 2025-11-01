@@ -15,8 +15,20 @@
 #include <cstdio>
 #include <unordered_set>
 
-void Node::debug_msg(int other, std::string msg) {
-    std::cout << "{At node " << this->node_number << " | to/from node"
+void Node::debug_msg(int other, bool sending, std::string msg) {
+    std::string send_or_rcv;
+    if (sending) send_or_rcv = "SEND";
+    else send_or_rcv = "RECEIVE";
+    std::cout << "{" << this->node_number << " " <<  send_or_rcv << " message to/from " 
+    << other << "} MSG = " << msg << "\n" << std::flush;
+}
+
+int Node::get_node_num(int fd) { //returns corresponding node number of a given file descriptor
+    for (const auto& pair : this->connections) {
+        if (pair.second.read_fd == fd || pair.second.write_fd == fd)
+            return pair.first;
+    }
+    return -1;
 }
 
 Node::Node(const config& node_info) {
@@ -177,20 +189,22 @@ void Node::send_message(int node, int msg_type, std::string msg) {
             vector_clock += std::to_string((this->clock)[i]) + " ";
         }
         std::string message = "0 " + vector_clock;
-        std::cout << "message size: " << message.size() << ", message being sent: " << &message[0] << "\nvector clock [" << vector_clock << "]\n" << std::flush;
+        //std::cout << "message size: " << message.size() << ", message being sent: " << &message[0] << "\nvector clock [" << vector_clock << "]\n" << std::flush;
+        debug_msg(node, true, message);
         int len = message.size();
         int len_net = htonl(len);
         write(sockfd, &len_net, sizeof(len_net));
-        std::cout << "MAP message. Node " << this->node_number << " wrote ||||||len=||||||" << len << " to Node " << node << " connection\n" << std::flush;
+        //std::cout << "MAP message. Node " << this->node_number << " wrote ||||||len=||||||" << len << " to Node " << node << " connection\n" << std::flush;
         write(sockfd, &message[0], message.size());
     }
     else if (msg_type == 1) { //Chandy-Lamport message. ie, control/marker message
         std::string message = "1" + msg;
-        std::cout << "message being sent: " << &message[0] << "\n" << std::flush;
+        //std::cout << "message being sent: " << &message[0] << "\n" << std::flush;
+        debug_msg(node, true, message);
         int len = message.size();
         int len_net = htonl(len);
         write(sockfd, &len_net, sizeof(len_net));
-        std::cout << "CL message. Node " << this->node_number << " wrote ||||||len=||||||" << len << " to Node " << node << " connection\n" << std::flush;
+        //std::cout << "CL message. Node " << this->node_number << " wrote ||||||len=||||||" << len << " to Node " << node << " connection\n" << std::flush;
         write(sockfd, &message[0], sizeof(char) * (message.size()));
     }
     else if (msg_type == 2) { //termination message
@@ -199,7 +213,8 @@ void Node::send_message(int node, int msg_type, std::string msg) {
         int len_net = htonl(len);
         int msg_net = htonl(msg);
         write(sockfd, &len_net, sizeof(int));
-        std::cout << "Termination message. Node " << this->node_number << " wrote ||||||len=||||||" << len << " to Node " << node << " connection\n" << std::flush;
+        //std::cout << "Termination message. Node " << this->node_number << " wrote ||||||len=||||||" << len << " to Node " << node << " connection\n" << std::flush;
+        debug_msg(node, true, std::to_string(msg));
         write(sockfd, &msg_net, sizeof(int));
     }
     else if (msg_type == 3) { //start message
@@ -208,7 +223,8 @@ void Node::send_message(int node, int msg_type, std::string msg) {
         int len_net = htonl(len);
         int msg_net = htonl(msg);
         write(sockfd, &len_net, sizeof(int));
-        std::cout << "start message. Node " << this->node_number << " wrote ||||||len=||||||" << len << " to Node " << node << " connection\n" << std::flush;
+        //std::cout << "start message. Node " << this->node_number << " wrote ||||||len=||||||" << len << " to Node " << node << " connection\n" << std::flush;
+        debug_msg(node, true, std::to_string(msg));
         write(sockfd, &msg_net, sizeof(int));
     }
 }
@@ -219,7 +235,8 @@ std::string Node::read_msg(int fd) {
     len = ntohl(len);
     size_t total_read = 0;
     char buffer[len];
-    std::cout << "len is " << len << "\n" << std::flush;
+    //std::cout << "len is " << len << "\n" << std::flush;
+    debug_msg(get_node_num(fd), false, "len is " + std::to_string(len));
     if (returnval == 0) { //socket connection closed, abort
         int nodenum = -1; 
         for (const auto& p : this->connections) { //obtain nodenum
@@ -229,7 +246,8 @@ std::string Node::read_msg(int fd) {
                 break;
             }
         }
-        std::cerr << "socket connection with " << nodenum << " closed. aborting" << " len is " << len << "\n" << std::flush;
+        //std::cerr << "socket connection with " << nodenum << " closed. aborting" << " len is " << len << "\n" << std::flush;
+        debug_msg(get_node_num(fd), false, "socket connection closed. aborting. len is " + std::to_string(len));
         this->destroy = true;
         return "";
     }
@@ -237,7 +255,8 @@ std::string Node::read_msg(int fd) {
         for (const auto& p : this->connections) {
             send_message(p.first, 2, "");
         }
-        std::cerr << "read failure. aborting\n";
+        //std::cerr << "read failure. aborting\n";
+        debug_msg(get_node_num(fd), false, "read failure. aborting");
         this->destroy = true;
         return "";
     }
@@ -258,7 +277,8 @@ std::string Node::read_msg(int fd) {
     std::string message(buffer, len);
 
     if (len == 1 && message[0] == '2') { //if termination message
-        std::cout << "connection closed, terminating program\n" << std::flush;
+        //std::cout << "connection closed, terminating program\n" << std::flush;
+        debug_msg(get_node_num(fd), false, "connection closed, terminating program");
         for (const auto& p : this->connections) {
             send_message(p.first, 2, "");
         }
@@ -345,7 +365,7 @@ void Node::begin_MAP() {
                         (this->clock)[i] = std::max((this->clock)[i], temp_clock[i]);
                     }
                     (this->clock)[this->node_number]++;
-                    std::cout << "messaeg size: " << msg.size() << ". Node " << this->node_number << " received message [" << msg << "] from: " << pair.first << "\n" << std::flush;
+                    debug_msg(pair.first, false, "");
                     std::cout << "vector clock: [";
                     for (int i = 0; i < (this->clock).size(); i++) {
                         std::cout << (this->clock)[i] << " ";

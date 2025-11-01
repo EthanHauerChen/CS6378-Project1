@@ -38,6 +38,8 @@ class Node {
     std::vector<int> extract_clock(std::string); //gets the clock values from a message
     void begin_MAP();
     void take_snapshot();
+    void debug_msg(int other, bool sending, std::string msg);
+    int get_node_num(int fd);
 
 public:
     Node(const config&);
