@@ -339,6 +339,7 @@ void Node::begin_MAP() {
             return; 
         }
     }
+    std::cout << "Node " << this->node_number << " start message from all neighbors, beginning MAP protocol\n" << std::flush;
     past = std::chrono::steady_clock::now();
 
     int messages_sent = 0;
