@@ -1,0 +1,171 @@
+Connecting to dc07...
+Connecting to dc08...
+Connecting to dc10...
+Connecting to dc11...
+Connecting to dc13...
+error: 0
+config {
+        nodes: 5
+        minPerActive: 6
+        maxPerActive: 10
+        minSendDelay: 100
+        snapshotDelay: 2000
+        maxNumber: 15
+        hostname: dc10.utdallas.edu
+        port: 8663
+        neighbors: [(hostname:dc08.utdallas.edu, port:8663, node #: 1), (hostname:dc11.utdallas.edu, port:8662, node #: 3), ]
+}
+Node setup {
+        Node number: 2
+        hostname: dc10.utdallas.edu
+        port: 8663
+}
+ready and listening on dc10.utdallas.edu:8663
+Client 2 connecting to hostname: dc08.utdallas.edu, port: 8663
+error: cannot connect to host dc08.utdallas.edu
+error: 0
+config {
+        nodes: 5
+        minPerActive: 6
+        maxPerActive: 10
+        minSendDelay: 100
+        snapshotDelay: 2000
+        maxNumber: 15
+        hostname: dc11.utdallas.edu
+        port: 8662
+        neighbors: [(hostname:dc08.utdallas.edu, port:8663, node #: 1), (hostname:dc10.utdallas.edu, port:8663, node #: 2), (hostname:dc13.utdallas.edu, port:8663, node #: 4), ]
+}
+Node setup {
+        Node number: 3
+        hostname: dc11.utdallas.edu
+        port: 8662
+}
+ready and listening on dc11.utdallas.edu:8662
+Client 3 connecting to hostname: dc08.utdallas.edu, port: 8663
+Client 3 connected to Server dc08.utdallas.edu:8663
+Client 3 connecting to hostname: dc10.utdallas.edu, port: 8663
+Client 3 connected to Server dc10.utdallas.edu:8663
+Client 3 connecting to hostname: dc13.utdallas.edu, port: 8663
+error: cannot connect to host dc13.utdallas.edu
+Server 2 connected with Client 3
+error: 0
+config {
+        nodes: 5
+        minPerActive: 6
+        maxPerActive: 10
+        minSendDelay: 100
+        snapshotDelay: 2000
+        maxNumber: 15
+        hostname: dc08.utdallas.edu
+        port: 8663
+        neighbors: [(hostname:dc07.utdallas.edu, port:8664, node #: 0), (hostname:dc10.utdallas.edu, port:8663, node #: 2), (hostname:dc11.utdallas.edu, port:8662, node #: 3), ]
+}
+Node setup {
+        Node number: 1
+        hostname: dc08.utdallas.edu
+        port: 8663
+}
+ready and listening on dc08.utdallas.edu:8663
+Client 1 connecting to hostname: dc07.utdallas.edu, port: 8664
+Server 1 connected with Client 3
+error: cannot connect to host dc07.utdallas.edu
+error: 0
+config {
+        nodes: 5
+        minPerActive: 6
+        maxPerActive: 10
+        minSendDelay: 100
+        snapshotDelay: 2000
+        maxNumber: 15
+        hostname: dc13.utdallas.edu
+        port: 8663
+        neighbors: [(hostname:dc07.utdallas.edu, port:8664, node #: 0), (hostname:dc11.utdallas.edu, port:8662, node #: 3), ]
+}
+Node setup {
+        Node number: 4
+        hostname: dc13.utdallas.edu
+        port: 8663
+}
+ready and listening on dc13.utdallas.edu:8663
+Client 4 connecting to hostname: dc07.utdallas.edu, port: 8664
+error: cannot connect to host dc07.utdallas.edu
+Server 1 connected with Client 0
+error: 0
+config {
+        nodes: 5
+        minPerActive: 6
+        maxPerActive: 10
+        minSendDelay: 100
+        snapshotDelay: 2000
+        maxNumber: 15
+        hostname: dc07.utdallas.edu
+        port: 8664
+        neighbors: [(hostname:dc08.utdallas.edu, port:8663, node #: 1), (hostname:dc13.utdallas.edu, port:8663, node #: 4), ]
+}
+Node setup {
+        Node number: 0
+        hostname: dc07.utdallas.edu
+        port: 8664
+}
+ready and listening on dc07.utdallas.edu:8664
+Client 0 connecting to hostname: dc08.utdallas.edu, port: 8663
+Client 0 connected to Server dc08.utdallas.edu:8663
+Client 0 connecting to hostname: dc13.utdallas.edu, port: 8663
+Client 0 connected to Server dc13.utdallas.edu:8663
+Server 4 connected with Client 0
+Server 3 connected with Client 2
+Server 1 connected with Client 2
+Client 2 connected to Server dc08.utdallas.edu:8663
+Client 2 connecting to hostname: dc11.utdallas.edu, port: 8662
+Client 2 connected to Server dc11.utdallas.edu:8662
+Client 3 connected to Server dc13.utdallas.edu:8663
+Server 3 connected with Client 1
+Server 2 connected with Client 1
+{2 SEND message to/from 1} MSG = 3
+{2 SEND message to/from 3} MSG = 3
+len is 1
+{2 RECEIVE message to/from 1} MSG =
+Server 0 connected with Client 1
+Server 4 connected with Client 3
+Client 1 connected to Server dc07.utdallas.edu:8664
+Client 1 connecting to hostname: dc10.utdallas.edu, port: 8663
+Client 1 connected to Server dc10.utdallas.edu:8663
+Client 1 connecting to hostname: dc11.utdallas.edu, port: 8662
+Client 1 connected to Server dc11.utdallas.edu:8662
+{1 SEND message to/from 2} MSG = 3
+{1 SEND message to/from 0} MSG = 3
+{1 SEND message to/from 3} MSG = 3
+len is 1
+{1 RECEIVE message to/from 2} MSG =
+Client 4 connected to Server dc07.utdallas.edu:8664
+Server 0 connected with Client 4
+{0 SEND message to/from 4} MSG = 3
+{0 SEND message to/from 1} MSG = 3
+len is 1
+{1 RECEIVE message to/from 0} MSG =
+Server 3 connected with Client 4
+{3 SEND message to/from 4} MSG = 3
+{3 SEND message to/from 2} MSG = 3
+{3 SEND message to/from 1} MSG = 3
+len is 1
+{3 RECEIVE message to/from 4} MSG =
+len is 1
+{3 RECEIVE message to/from 2} MSG =
+len is 1
+{3 RECEIVE message to/from 1} MSG =
+len is 768
+Client 4 connecting to hostname: dc11.utdallas.edu, port: 8662
+Client 4 connected to Server dc11.utdallas.edu:8662
+{4 SEND message to/from 3} MSG = 3
+{4 SEND message to/from 0} MSG = 3
+len is 1
+{4 RECEIVE message to/from 3} MSG =
+len is 1
+{4 RECEIVE message to/from 0} MSG =
+len is 768
+len is 1
+{2 RECEIVE message to/from 3} MSG =
+len is 768
+len is 1
+{1 RECEIVE message to/from 3} MSG =
+len is 768
