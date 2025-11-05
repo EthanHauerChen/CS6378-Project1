@@ -334,6 +334,7 @@ void Node::begin_MAP() {
     while (heard_back.size() < (this->connections).size()) {
         for (const auto& pair : this->connections) {
             std::string msg = read_msg(pair.second.read_fd);
+            std::cout << "socket closed here?\n" << std::flush;
             if (msg.empty()) continue;
             else if (msg[0] == '3') {
                 heard_back.emplace(pair.first);
