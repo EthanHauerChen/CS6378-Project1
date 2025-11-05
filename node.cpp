@@ -276,7 +276,7 @@ std::string Node::read_msg(int fd) {
     }
     std::cout << "char buffer[]: ";
     for (int i = 0; i < len; i++) {
-        std::cout << char[i];
+        std::cout << buffer[i];
     }
     std::cout << "\nstring message: ";
     std::string message(buffer, len);
