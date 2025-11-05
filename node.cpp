@@ -536,6 +536,7 @@ void Node::do_MAP() {
         
         this->become_passive();
     }
+    snapfile.close();
 }
 
 void Node::print_snapshot() {
