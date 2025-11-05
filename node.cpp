@@ -408,6 +408,7 @@ void Node::begin_MAP() {
                     }
                 }
                 else if (msg == "2") { //failure due to socket closed or some other fatal error
+                    std::cout << "msg == 2\n" << std::flush;
                     for (const auto& p : this->connections) { //obtain nodenum
                         send_message(p.first, 2, ""); //send termination messages to neighbors
                     }
