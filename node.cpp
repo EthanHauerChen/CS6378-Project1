@@ -97,6 +97,9 @@ int Node::listen_for_connections(int num_neighbors) {
             read(connection_fd, &node, sizeof(int));
             std::cout << "Server " << node_number << " connected with Client " << node << "\n" << std::flush;
 
+            //make nonblocking
+            fcntl(connection_fd, F_SETFL, O_NONBLOCK);
+
             /* place associated socket fd into connections hash table */
             if (connections.find(node) == connections.end()) { //same as connections.contains(node), but contains only available for c++20 
                 connections.insert({node, {connection_fd, -1}});
@@ -253,13 +256,12 @@ std::string Node::read_msg(int fd) {
         return "";
     }
     else if (returnval < 0) {
-        for (const auto& p : this->connections) { //send termination messages to neighbors
-            send_message(p.first, 2, "");
-        }
-        //std::cerr << "read failure. aborting\n";
-        debug_msg(get_node_num(fd), false, "read failure. aborting");
-        this->destroy = true;
-        std::cout << "this in read_msg " << this << "\n" << std::flush; 
+        // no data to read right now
+        if (errno == EAGAIN || errno == EWOULDBLOCK)
+            return ""; // no data available
+        if (errno == EINTR)
+            return read_message(fd); // interrupted, retry
+        std::cout << "read length failed\n" << std::flush;
         return "";
     }
 
@@ -281,7 +283,7 @@ std::string Node::read_msg(int fd) {
         std::cout << buffer[i];
     }
     std::cout << "\nstring message: ";
-    std::string message(buffer, len);
+    std::string message(buffer, total_read);
     std::cout << message << "\n" << std::flush;
 
     if (len == 1 && message[0] == '2') { //if termination message
