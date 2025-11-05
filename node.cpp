@@ -260,7 +260,7 @@ std::string Node::read_msg(int fd) {
         if (errno == EAGAIN || errno == EWOULDBLOCK)
             return ""; // no data available
         if (errno == EINTR)
-            return read_message(fd); // interrupted, retry
+            return read_msg(fd); // interrupted, retry
         std::cout << "read length failed\n" << std::flush;
         return "";
     }
