@@ -339,6 +339,7 @@ void Node::begin_MAP() {
             else if (msg[0] == '3') {
                 heard_back.emplace(pair.first);
             }
+            else if (msg == "2") return;
         }
         if (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - past).count() > 8) {
             std::cerr << "failure to hear back from all neighbors, abort\n";
