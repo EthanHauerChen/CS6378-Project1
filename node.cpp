@@ -345,7 +345,7 @@ bool Node::start_MAP() { //startup function, consists of ensuring all nodes are 
             else if (msg == "2") return false;
         }
         if (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - past).count() > 8) {
-            std::cerr << "failure to hear back from all neighbors, abort\n";
+            std::cerr << "Node " << this->node_number << " failure to hear back from all neighbors, abort\n";
             return false; 
         }
     }
