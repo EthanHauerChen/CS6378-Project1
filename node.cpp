@@ -335,12 +335,21 @@ bool Node::start_MAP() { //startup function, consists of ensuring all nodes are 
     int num_started = 0;
     std::unordered_set<int> heard_back; //nodes that we have heard back from
     auto past = std::chrono::steady_clock::now(); //if process takes too long, abort
+    
+    std::cout << "Node " << this->node_number << " neighbors: ";
+    for (const auto& pair : this->connections) {
+        std::cout << pair.first << " "
+    }
+    std::cout << "\n" << std::flush;
+    
+    std::cout << "Node " << this->node_number << " heard back from neighbors: ";
     while (heard_back.size() < (this->connections).size()) {
         for (const auto& pair : this->connections) {
             std::string msg = read_msg(pair.second.read_fd);
             if (msg.empty()) continue;
             else if (msg[0] == '3') {
                 heard_back.emplace(pair.first);
+                std::cout << pair.first << " ";
             }
             else if (msg == "2") return false;
         }
@@ -349,6 +358,7 @@ bool Node::start_MAP() { //startup function, consists of ensuring all nodes are 
             return false; 
         }
     }
+    std::cout << "\n" << std::flush;
     std::cout << "Node " << this->node_number << " start message from all neighbors, beginning MAP protocol\n" << std::flush;
     return true;
 
