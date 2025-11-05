@@ -244,7 +244,6 @@ std::string Node::read_msg(int fd) {
     if (returnval == 0) { //socket connection closed, abort
         int nodenum = -1; 
         for (const auto& p : this->connections) { //obtain nodenum
-            send_message(p.first, 2, ""); //send termination messages to neighbors
             if (p.second.read_fd == fd) {
                 nodenum = p.first;
                 break;
@@ -253,7 +252,7 @@ std::string Node::read_msg(int fd) {
         //std::cerr << "socket connection with " << nodenum << " closed. aborting" << " len is " << len << "\n" << std::flush;
         debug_msg(get_node_num(fd), false, "socket connection closed. aborting. len is " + std::to_string(len));
         this->destroy = true;
-        return "";
+        return "2"; // have MAP protocol handle the termination, sending termination messages to all neighbors
     }
     else if (returnval < 0) {
         // no data to read right now
@@ -268,8 +267,7 @@ std::string Node::read_msg(int fd) {
     while (total_read < len) {
         ssize_t n = read(fd, buffer + total_read, len - total_read);
         if (n == 0) {
-            //connection closed
-            break;
+            return "2";
         } else if (n < 0) {
             if (errno == EINTR)
                 continue; //interrupted, try again
@@ -289,11 +287,8 @@ std::string Node::read_msg(int fd) {
     if (len == 1 && message[0] == '2') { //if termination message
         //std::cout << "connection closed, terminating program\n" << std::flush;
         debug_msg(get_node_num(fd), false, "connection closed, terminating program");
-        for (const auto& p : this->connections) {
-            send_message(p.first, 2, "");
-        }
         this->destroy = true;
-        return message;
+        return "2";
     }
 
     debug_msg(get_node_num(fd), false, "successful read: " + message);
@@ -411,6 +406,12 @@ void Node::begin_MAP() {
                         int nod_num = msg[2] - '0';
                         (this->snapshot)[nod_num] = this->extract_clock(msg);
                     }
+                }
+                else if (msg == "2") { //failure due to socket closed or some other fatal error
+                    for (const auto& p : this->connections) { //obtain nodenum
+                        send_message(p.first, 2, ""); //send termination messages to neighbors
+                    }
+                    return;
                 }
             }
         }
