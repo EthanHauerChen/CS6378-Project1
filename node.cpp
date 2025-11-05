@@ -248,6 +248,7 @@ std::string Node::read_msg(int fd) {
                 nodenum = p.first;
                 break;
             }
+            send_message(p.first, 2, ""); //send termination messages to neighbors
         }
         //std::cerr << "socket connection with " << nodenum << " closed. aborting" << " len is " << len << "\n" << std::flush;
         debug_msg(get_node_num(fd), false, "socket connection closed. aborting. len is " + std::to_string(len));
@@ -334,7 +335,6 @@ void Node::begin_MAP() {
     while (heard_back.size() < (this->connections).size()) {
         for (const auto& pair : this->connections) {
             std::string msg = read_msg(pair.second.read_fd);
-            std::cout << "socket closed here?\n" << std::flush;
             if (msg.empty()) continue;
             else if (msg[0] == '3') {
                 heard_back.emplace(pair.first);
