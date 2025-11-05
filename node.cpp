@@ -500,6 +500,7 @@ void Node::do_MAP() {
                 else if (msg[0] == '1') { //CL protocol
                     for (size_t i = 0; i < (this->clock).size(); ++i) {
                         snapfile << clock[i] << " ";
+                        std::cout << "Node " << node_number << " wrote " << clock[i] << " to snapfile\n" << std::flush;
                     }
                     snapfile << "\n";
                     if (!(this->isRecording)) {
