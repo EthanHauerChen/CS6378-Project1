@@ -282,13 +282,13 @@ std::string Node::read_msg(int fd) {
         }
         total_read += n;
     }
-    std::cout << "char buffer[]: ";
+    //std::cout << "char buffer[]: ";
     for (int i = 0; i < len; i++) {
         std::cout << buffer[i];
     }
-    std::cout << "\nstring message: ";
+    //std::cout << "\nstring message: ";
     std::string message(buffer, total_read);
-    std::cout << message << "\n" << std::flush;
+    //std::cout << message << "\n" << std::flush;
 
     if (len == 1 && message[0] == '2') { //if termination message
         //std::cout << "connection closed, terminating program\n" << std::flush;
