@@ -329,6 +329,7 @@ bool Node::start_MAP() { //startup function, consists of ensuring all nodes are 
     for (const auto& pair : this->connections) {
         send_message(pair.first, 3, "");
     }
+    std::cout << "Node " << this->node_number << " broadcast to all neighbors\n" << std::flush;
 
     //wait for start message ACK
     int num_started = 0;
@@ -338,7 +339,7 @@ bool Node::start_MAP() { //startup function, consists of ensuring all nodes are 
         for (const auto& pair : this->connections) {
             std::string msg = read_msg(pair.second.read_fd);
             if (msg.empty()) continue;
-            else if (msg[0] == '4') {
+            else if (msg[0] == '3') {
                 heard_back.emplace(pair.first);
             }
             else if (msg == "2") return false;
