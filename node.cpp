@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <cstdio>
 #include <unordered_set>
+#include <fstream>
 
 void Node::debug_msg(int other, bool sending, std::string msg) {
     std::string send_or_rcv;
@@ -436,7 +437,7 @@ void Node::do_MAP() {
     std::ofstream snapfile(filename);
     if (!snapfile) {
         std::cerr << "Error: Could not open file " << filename << " for writing.\n";
-        return 1;
+        return;
     }
 
     //wait for start message response to begin
