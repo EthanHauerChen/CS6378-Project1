@@ -286,7 +286,7 @@ std::string Node::read_msg(int fd) {
         return message;
     }
 
-    debug_msg(get_node_num(fd), false, message);
+    debug_msg(get_node_num(fd), false, "successful read: " + message);
     return message;
 }
 
