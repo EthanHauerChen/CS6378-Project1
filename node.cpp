@@ -464,7 +464,10 @@ void Node::do_MAP() {
     while (!(this->terminateProtocol) && !(this->destroy)) {
         std::cout << "this in loop " << this << "\n" << std::flush; 
         auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - past);
-        if (elapsed.count() > 17) return; //if doing nothing for long time, stop executing program
+        if (elapsed.count() > 17) {
+            snapfile.close();
+            return; //if doing nothing for long time, stop executing program
+        }
         if (messages_sent < this->maxNumber && (this->isActive)) {
             int num = num_messages(gen);
             for (int i = 0; i < num; i++) {
@@ -529,6 +532,7 @@ void Node::do_MAP() {
                     for (const auto& p : this->connections) { //obtain nodenum
                         send_message(p.first, 2, ""); //send termination messages to neighbors
                     }
+                    snapfile.close();
                     return;
                 }
             }
