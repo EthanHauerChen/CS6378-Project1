@@ -240,7 +240,7 @@ std::string Node::read_msg(int fd) {
     len = ntohl(len);
     size_t total_read = 0;
     char buffer[len];
-    std::cout << "len is " << len << "\n" << std::flush;
+    //std::cout << "len is " << len << "\n" << std::flush;
     if (returnval == 0) { //socket connection closed, abort
         int nodenum = -1; 
         for (const auto& p : this->connections) { //obtain nodenum
