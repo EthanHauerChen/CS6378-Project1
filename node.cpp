@@ -208,24 +208,26 @@ void Node::send_message(int node, int msg_type, std::string msg) {
         write(sockfd, &message[0], sizeof(char) * (message.size()));
     }
     else if (msg_type == 2) { //termination message
-        int len = 1;
-        int msg = 2;
+        // int len = 1;
+        // int msg = 2;
+        // int len_net = htonl(len);
+        // int msg_net = htonl(msg);
+        char msg = '2';
+        int len = sizeof(char);
         int len_net = htonl(len);
-        int msg_net = htonl(msg);
         write(sockfd, &len_net, sizeof(int));
         //std::cout << "Termination message. Node " << this->node_number << " wrote ||||||len=||||||" << len << " to Node " << node << " connection\n" << std::flush;
-        debug_msg(node, true, std::to_string(msg));
-        write(sockfd, &msg_net, sizeof(int));
+        debug_msg(node, true, "" + msg);
+        write(sockfd, &msg, sizeof(char));
     }
     else if (msg_type == 3) { //start message
-        int len = 1;
-        int msg = 3;
+        char msg = '3';
+        int len = sizeof(char);
         int len_net = htonl(len);
-        int msg_net = htonl(msg);
         write(sockfd, &len_net, sizeof(int));
-        //std::cout << "start message. Node " << this->node_number << " wrote ||||||len=||||||" << len << " to Node " << node << " connection\n" << std::flush;
-        debug_msg(node, true, std::to_string(msg));
-        write(sockfd, &msg_net, sizeof(int));
+        //std::cout << "Termination message. Node " << this->node_number << " wrote ||||||len=||||||" << len << " to Node " << node << " connection\n" << std::flush;
+        debug_msg(node, true, "" + msg);
+        write(sockfd, &msg, sizeof(char));
     }
 }
 
