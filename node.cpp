@@ -431,6 +431,14 @@ void Node::do_MAP() {
     auto past = std::chrono::steady_clock::now();
     if (this->node_number == 0) snapshot[0] = this->clock;
 
+    //snapshot file
+    std::string filename = "config-" + std::to_string(this->node_number) + ".out";
+    std::ofstream snapfile(filename);
+    if (!snapfile) {
+        std::cerr << "Error: Could not open file " << filename << " for writing.\n";
+        return 1;
+    }
+
     //wait for start message response to begin
     // int num_started = 0;
     // std::unordered_set<int> heard_back; //nodes that we have heard back from
@@ -486,6 +494,10 @@ void Node::do_MAP() {
                     this->become_active();
                 }
                 else if (msg[0] == '1') { //CL protocol
+                    for (size_t i = 0; i < (this->clock).size(); ++i) {
+                        snapfile << clock[i] << " ";
+                    }
+                    snapfile << "\n";
                     if (!(this->isRecording)) {
                         this->isRecording = true;
                         this->parent = pair.first; //parent node, we will send our snapshot and other snapshots to parent
