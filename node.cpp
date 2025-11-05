@@ -427,6 +427,7 @@ void Node::do_MAP() {
     std::mt19937 gen(rd()); // mersenne_twister_engine seeded with rd()
     std::uniform_int_distribution<> num_messages(this->minPerActive, this->maxPerActive);
     std::uniform_int_distribution<> nodes(0, (this->connections).size() - 1);
+    std::uniform_int_distribution<> coinflip(0, 1);
     std::vector<int> temp_connections;
     for (const auto& pair : this->connections) temp_connections.push_back(pair.first); //in order to random access nodes to send messages to, construct vector of node_nums
     auto past = std::chrono::steady_clock::now();
@@ -496,6 +497,13 @@ void Node::do_MAP() {
                     }
                     std::cout << "]\n" << std::flush;
                     this->become_active();
+                    if (coinflip(gen) == 1) {
+                        for (size_t i = 0; i < (this->clock).size(); ++i) {
+                            snapfile << clock[i] << " ";
+                            std::cout << "Node " << node_number << " wrote " << clock[i] << " to snapfile\n" << std::flush;
+                        }
+                        snapfile << "\n";
+                    }
                 }
                 else if (msg[0] == '1') { //CL protocol
                     for (size_t i = 0; i < (this->clock).size(); ++i) {
