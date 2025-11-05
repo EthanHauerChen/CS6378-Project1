@@ -50,11 +50,7 @@ Node::Node(const config& node_info) {
     "hostname: " << hostname << "\n\t" <<
     "port: " << port << "\n}\n";
     if (setup(node_info) > -1) {
-        //broadcast begin message
-        for (const auto& pair : this->connections) {
-            send_message(pair.first, 3, "");
-        }
-        begin_MAP();
+        do_MAP();
     }
 }
 
@@ -232,6 +228,15 @@ void Node::send_message(int node, int msg_type, std::string msg) {
         debug_msg(node, true, std::string(1, msg));
         write(sockfd, &msg, sizeof(char));
     }
+    else if (msg_type == 4) { //start message ACK
+        char msg = '4';
+        int len = sizeof(char);
+        int len_net = htonl(len);
+        write(sockfd, &len_net, sizeof(int));
+        //std::cout << "Termination message. Node " << this->node_number << " wrote ||||||len=||||||" << len << " to Node " << node << " connection\n" << std::flush;
+        debug_msg(node, true, std::string(1, msg));
+        write(sockfd, &msg, sizeof(char));
+    }
 }
 
 std::string Node::read_msg(int fd) {
@@ -319,7 +324,94 @@ std::vector<int> Node::extract_clock(std::string msg) {
     return clock_vals;
 }
 
-void Node::begin_MAP() {    
+bool Node::start_MAP() { //startup function, consists of ensuring all nodes are setup before beginning MAP protocol
+    //broadcast start message
+    for (const auto& pair : this->connections) {
+        send_message(pair.first, 3, "");
+    }
+
+    //wait for start message ACK
+    int num_started = 0;
+    std::unordered_set<int> heard_back; //nodes that we have heard back from
+    auto past = std::chrono::steady_clock::now(); //if process takes too long, abort
+    while (heard_back.size() < (this->connections).size()) {
+        for (const auto& pair : this->connections) {
+            std::string msg = read_msg(pair.second.read_fd);
+            if (msg.empty()) continue;
+            else if (msg[0] == '4') {
+                heard_back.emplace(pair.first);
+            }
+            else if (msg == "2") return false;
+        }
+        if (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - past).count() > 8) {
+            std::cerr << "failure to hear back from all neighbors, abort\n";
+            return false; 
+        }
+    }
+    std::cout << "Node " << this->node_number << " start message from all neighbors, beginning MAP protocol\n" << std::flush;
+    return true;
+
+    // //node 0 starts by broadcasting a begin message
+    // if (this->node_number == 0) {
+    //     for (const auto& pair : this->connections) {
+    //         send_message(pair.first, 3, "");
+    //     }
+    // }
+
+    // //wait to receive begin message, record the node that it was received from
+    // bool begin_rcvd = false;
+    // int parent_node = -1; //node num of the first node begin message received from
+    // auto past = std::chrono::steady_clock::now(); //if process takes too long, abort
+    // while (!begin_rcvd) {
+    //     for (const auto& pair : this->connections) {
+    //         std::string msg = read_msg(pair.second.read_fd);
+    //         if (msg.empty()) continue;
+    //         else if (msg[0] == '3') {
+    //             parent_node = pair.first;
+    //         }
+    //         else if (msg == "2") return false;
+    //     }
+    //     if (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - past).count() > 8) {
+    //         std::cerr << "failure to hear back from all neighbors, abort\n";
+    //         return false; 
+    //     }
+    // }
+
+    // //propogate begin message to all non-parent nodes
+    // for (const auto& pair : this->connections) {
+    //     if (pair.first == parent_node) continue;
+    //     send_message(pair.first, 3, "");
+    // }
+
+    // //edge nodes responsible for initiating ACK messages
+    
+
+    // //once ACKs received from all neighbors, send ACK to parent
+    // past = std::chrono::steady_clock::now();
+    // int num_started = 0;
+    // std::unordered_set<int> heard_back; //nodes that we have heard back from
+    // int zero_or_not = this->node_number == 0 ? 0 : 1;
+    // while (heard_back.size() < (this->connections).size() - zero_or_not) {
+    //     for (const auto& pair : this->connections) {
+    //         std::string msg = read_msg(pair.second.read_fd);
+    //         if (pair.first == parent_node || msg.empty()) continue;
+    //         else if (msg[0] == '3') {
+    //             heard_back.emplace(pair.first);
+    //         }
+    //         else if (msg == "2") return;
+    //     }
+    //     if (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - past).count() > 8) {
+    //         std::cerr << "failure to hear back from all neighbors, abort\n";
+    //         return; 
+    //     }
+    // }
+    // std::cout << "Node " << this->node_number << " start message from all neighbors, beginning MAP protocol\n" << std::flush;
+
+
+}
+
+void Node::do_MAP() {
+    if (!start_MAP()) return;    
     std::random_device rd;  // a seed source for the random number engine
     std::mt19937 gen(rd()); // mersenne_twister_engine seeded with rd()
     std::uniform_int_distribution<> num_messages(this->minPerActive, this->maxPerActive);
@@ -330,24 +422,24 @@ void Node::begin_MAP() {
     if (this->node_number == 0) snapshot[0] = this->clock;
 
     //wait for start message response to begin
-    int num_started = 0;
-    std::unordered_set<int> heard_back; //nodes that we have heard back from
-    while (heard_back.size() < (this->connections).size()) {
-        for (const auto& pair : this->connections) {
-            std::string msg = read_msg(pair.second.read_fd);
-            if (msg.empty()) continue;
-            else if (msg[0] == '3') {
-                heard_back.emplace(pair.first);
-            }
-            else if (msg == "2") return;
-        }
-        if (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - past).count() > 8) {
-            std::cerr << "failure to hear back from all neighbors, abort\n";
-            return; 
-        }
-    }
-    std::cout << "Node " << this->node_number << " start message from all neighbors, beginning MAP protocol\n" << std::flush;
-    past = std::chrono::steady_clock::now();
+    // int num_started = 0;
+    // std::unordered_set<int> heard_back; //nodes that we have heard back from
+    // while (heard_back.size() < (this->connections).size()) {
+    //     for (const auto& pair : this->connections) {
+    //         std::string msg = read_msg(pair.second.read_fd);
+    //         if (msg.empty()) continue;
+    //         else if (msg[0] == '3') {
+    //             heard_back.emplace(pair.first);
+    //         }
+    //         else if (msg == "2") return;
+    //     }
+    //     if (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - past).count() > 8) {
+    //         std::cerr << "failure to hear back from all neighbors, abort\n";
+    //         return; 
+    //     }
+    // }
+    // std::cout << "Node " << this->node_number << " start message from all neighbors, beginning MAP protocol\n" << std::flush;
+    // past = std::chrono::steady_clock::now();
 
     int messages_sent = 0;
     while (!(this->terminateProtocol) && !(this->destroy)) {
