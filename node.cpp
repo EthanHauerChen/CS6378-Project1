@@ -412,6 +412,7 @@ bool Node::start_MAP() { //startup function, consists of ensuring all nodes are 
 
 void Node::do_MAP() {
     if (!start_MAP()) return;    
+    std::cout << "Node " << this->node_number << " startup success\n" << std::flush;
     std::random_device rd;  // a seed source for the random number engine
     std::mt19937 gen(rd()); // mersenne_twister_engine seeded with rd()
     std::uniform_int_distribution<> num_messages(this->minPerActive, this->maxPerActive);
