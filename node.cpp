@@ -338,7 +338,7 @@ bool Node::start_MAP() { //startup function, consists of ensuring all nodes are 
     
     std::cout << "Node " << this->node_number << " neighbors: ";
     for (const auto& pair : this->connections) {
-        std::cout << pair.first << " "
+        std::cout << pair.first << " ";
     }
     std::cout << "\n" << std::flush;
     
